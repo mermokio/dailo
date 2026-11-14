@@ -117,7 +117,7 @@ main {
   filter: drop-shadow(0 5px 9px rgba(112, 165, 91, 0.15));
 }
 
-.brand-mark svg { display: block; width: 100%; height: 100%; }
+.brand-mark img { display: block; width: 100%; height: 100%; border-radius: inherit; object-fit: cover; }
 
 .brand-copy { display: grid; line-height: 1; }
 .brand-copy strong { font-family: "Avenir Next", "Segoe UI", system-ui, sans-serif; font-size: 1.08rem; letter-spacing: -0.03em; }
