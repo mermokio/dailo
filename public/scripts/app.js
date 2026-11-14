@@ -25,6 +25,11 @@ const els = {
   gameProgress: document.querySelector("#game-progress"),
   gameMessage: document.querySelector("#game-message"),
   gameSwitcher: document.querySelector("#game-switcher"),
+  gameCard: document.querySelector(".game-card"),
+  keyboardWrap: document.querySelector(".keyboard-wrap"),
+  privacyNote: document.querySelector("#privacy-note"),
+  dayDone: document.querySelector("#day-done"),
+  gameActions: document.querySelector("#game-actions"),
   shareButton: document.querySelector("#share-result-button"),
   toast: document.querySelector("#toast"),
   confetti: document.querySelector("#confetti"),
@@ -42,6 +47,7 @@ const els = {
 let state = loadState();
 let activeGame = Number(state.activeGame) || 0;
 let isAnimating = false;
+let isDoneForToday = false;
 let viewportSyncFrame = 0;
 
 function syncViewportHeight() {
@@ -114,7 +120,12 @@ function render() {
   renderSwitcher();
   renderMessage(game, answer);
   renderStats();
-  els.shareButton.hidden = game.status === "playing";
+  els.gameActions.hidden = game.status === "playing" || isDoneForToday;
+  els.gameSwitcher.hidden = isDoneForToday;
+  els.gameCard.hidden = isDoneForToday;
+  els.keyboardWrap.hidden = isDoneForToday;
+  els.privacyNote.hidden = isDoneForToday;
+  els.dayDone.hidden = !isDoneForToday;
 }
 
 function renderBoard(game, answer) {
@@ -352,6 +363,7 @@ function shareText() {
 function drawShareCard() {
   const canvas = els.shareCanvas;
   const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas is not available");
   const game = currentGame();
   const answer = dailyAnswers[activeGame];
   const rows = game.guesses.map((guess) => scoreGuess(guess, answer));
@@ -389,11 +401,20 @@ function drawShareCard() {
   const gap = 18;
   const startX = (canvas.width - (size * 5 + gap * 4)) / 2;
   const startY = 455;
-  rows.forEach((row, rowIndex) => {
-    row.forEach((result, column) => {
-      ctx.fillStyle = result === "correct" ? "#5f9513" : result === "present" ? "#9a7610" : "#3b4658";
-      roundRect(ctx, startX + column * (size + gap), startY + rowIndex * (size + gap), size, size, 20);
-      ctx.fill();
+  Array.from({ length: MAX_GUESSES }, (_, rowIndex) => rows[rowIndex] || null).forEach((row, rowIndex) => {
+    Array.from({ length: WORD_LENGTH }, (_, column) => {
+      const x = startX + column * (size + gap);
+      const y = startY + rowIndex * (size + gap);
+      if (row) {
+        ctx.fillStyle = row[column] === "correct" ? "#5f9513" : row[column] === "present" ? "#9a7610" : "#3b4658";
+        roundRect(ctx, x, y, size, size, 20);
+        ctx.fill();
+      } else {
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "rgba(255,255,255,.12)";
+        roundRect(ctx, x, y, size, size, 20);
+        ctx.stroke();
+      }
     });
   });
   ctx.fillStyle = "#6f7887";
@@ -404,15 +425,43 @@ function drawShareCard() {
 
 function roundRect(ctx, x, y, width, height, radius) {
   ctx.beginPath();
-  ctx.roundRect(x, y, width, height, radius);
+  if (typeof ctx.roundRect === "function") {
+    ctx.roundRect(x, y, width, height, radius);
+    return;
+  }
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.arcTo(x + width, y, x + width, y + radius, radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.arcTo(x + width, y + height, x + width - radius, y + height, radius);
+  ctx.lineTo(x + radius, y + height);
+  ctx.arcTo(x, y + height, x, y + height - radius, radius);
+  ctx.lineTo(x, y + radius);
+  ctx.arcTo(x, y, x + radius, y, radius);
+  ctx.closePath();
 }
 
-function canvasBlob() {
-  return new Promise((resolve) => els.shareCanvas.toBlob(resolve, "image/png"));
+async function canvasBlob() {
+  drawShareCard();
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  const canvas = els.shareCanvas;
+  const blob = typeof canvas.toBlob === "function"
+    ? await new Promise((resolve) => canvas.toBlob(resolve, "image/png"))
+    : null;
+  if (blob) return blob;
+  const dataUrl = canvas.toDataURL("image/png");
+  const response = await fetch(dataUrl);
+  return response.blob();
 }
 
 async function shareImage() {
-  const blob = await canvasBlob();
+  let blob;
+  try {
+    blob = await canvasBlob();
+  } catch {
+    toast("Couldn't create the share image. Try saving it instead.");
+    return;
+  }
   const file = new File([blob], `dailo-${today}-${activeGame + 1}.png`, { type: "image/png" });
   if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
     try {
@@ -427,8 +476,12 @@ async function shareImage() {
 }
 
 async function saveImage() {
-  downloadBlob(await canvasBlob());
-  toast("Share image saved");
+  try {
+    downloadBlob(await canvasBlob());
+    toast("Share image saved");
+  } catch {
+    toast("Couldn't save the share image. Please try again.");
+  }
 }
 
 function downloadBlob(blob) {
@@ -491,7 +544,22 @@ document.querySelectorAll("dialog").forEach((dialog) => dialog.addEventListener(
   if (event.target === dialog) dialog.close();
 }));
 
-els.shareButton.addEventListener("click", () => { drawShareCard(); openModal(els.shareModal); });
+els.shareButton.addEventListener("click", () => {
+  try {
+    drawShareCard();
+    openModal(els.shareModal);
+  } catch {
+    toast("Couldn't create the share image. Please try again.");
+  }
+});
+document.querySelector("#done-for-now-button").addEventListener("click", () => {
+  isDoneForToday = true;
+  render();
+});
+document.querySelector("#return-to-games-button").addEventListener("click", () => {
+  isDoneForToday = false;
+  render();
+});
 document.querySelector("#native-share-button").addEventListener("click", shareImage);
 document.querySelector("#save-image-button").addEventListener("click", saveImage);
 document.querySelector("#copy-result-button").addEventListener("click", copyResult);

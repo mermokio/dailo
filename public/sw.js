@@ -1,4 +1,4 @@
-const CACHE_NAME = "dailo-v4";
+const CACHE_NAME = "dailo-v5";
 const APP_SHELL = [
   "./",
   "./index.html",

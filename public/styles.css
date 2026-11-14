@@ -304,22 +304,49 @@ main {
 
 .game-message strong { color: var(--lime); }
 
-.share-result-button {
+.game-actions {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 0.5rem;
+  margin-top: 0.22rem;
+}
+.game-actions[hidden] { display: none; }
+
+.share-result-button,
+.done-for-now-button {
   width: calc(100% - 0.5rem);
   height: 2.35rem;
-  margin: 0.22rem 0.25rem 0;
   border: 0;
   border-radius: 0.9rem;
-  background: var(--lime);
-  color: var(--ink);
   font-weight: 800;
   cursor: pointer;
   animation: button-rise 400ms ease both;
 }
 
+.share-result-button { margin: 0 0.25rem; background: var(--lime); color: var(--ink); }
+.done-for-now-button { width: 100%; padding: 0 0.45rem; border: 1px solid var(--line); background: transparent; color: var(--muted); font-size: 0.72rem; }
 .share-result-button svg { width: 1rem; margin: 0 0.4rem -0.18rem 0; fill: currentColor; }
-.game-card:has(.share-result-button:not([hidden])) .game-message { display: none; }
+.game-card:has(.game-actions:not([hidden])) .game-message { display: none; }
 @keyframes button-rise { from { opacity: 0; transform: translateY(8px); } }
+
+.day-done {
+  display: flex;
+  width: min(100%, 27rem);
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+.day-done[hidden] { display: none; }
+.day-done-icon { display: grid; width: 3.2rem; height: 3.2rem; place-items: center; margin-bottom: 1rem; border-radius: 1.15rem; background: color-mix(in srgb, var(--lime) 18%, transparent); color: var(--lime); font-size: 1.7rem; }
+.day-done .eyebrow { margin: 0 0 0.5rem; }
+.day-done h2 { margin: 0; font-size: clamp(1.8rem, 8vw, 2.4rem); line-height: 1.05; letter-spacing: -0.05em; }
+.day-done p:not(.eyebrow) { max-width: 22rem; color: var(--muted); font-size: 0.95rem; line-height: 1.55; }
+.day-done .secondary-button { width: auto; min-height: 2.8rem; padding: 0 1.2rem; border: 1px solid var(--line); border-radius: 1rem; background: transparent; color: var(--paper); font-weight: 700; cursor: pointer; }
 
 .keyboard-wrap {
   flex: 0 0 auto;
