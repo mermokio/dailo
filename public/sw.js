@@ -1,4 +1,4 @@
-const CACHE_NAME = "dailo-v6";
+const CACHE_NAME = "dailo-v7";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -7,9 +7,9 @@ const APP_SHELL = [
   "./scripts/app.js",
   "./scripts/game.js",
   "./assets/words.js",
-  "./assets/icon-192.png",
-  "./assets/icon-512.png",
-  "./assets/icon.svg"
+  "./assets/icon-lighthouse-180.png",
+  "./assets/icon-lighthouse-192.png",
+  "./assets/icon-lighthouse-512.png"
 ];
 
 self.addEventListener("install", (event) => {
