@@ -479,24 +479,18 @@ async function shareImage() {
       if (error.name === "AbortError") return;
     }
   }
-  if (navigator.share) {
-    try {
-      await navigator.share({ title: "My Dailo", text: shareText() });
-      toast("Shared the emoji result instead; image sharing isn't supported here.");
-      return;
-    } catch (error) {
-      if (error.name === "AbortError") return;
-    }
-  }
-  toast("Image sharing isn't supported here. You can copy the emoji result instead.");
+  toast("Image sharing isn't supported here. Try Share emoji result instead.");
 }
 
-async function copyResult() {
+async function shareEmojiResult() {
+  if (!navigator.share) {
+    toast("Sharing isn't supported in this browser.");
+    return;
+  }
   try {
-    await navigator.clipboard.writeText(shareText());
-    toast("Emoji result copied");
-  } catch {
-    toast("Copy wasn't available here");
+    await navigator.share({ title: "My Dailo", text: shareText() });
+  } catch (error) {
+    if (error.name !== "AbortError") toast("Couldn't open the share sheet. Please try again.");
   }
 }
 
@@ -552,7 +546,7 @@ els.shareButton.addEventListener("click", async () => {
 });
 els.submitButton.addEventListener("click", submitGuess);
 document.querySelector("#native-share-button").addEventListener("click", shareImage);
-document.querySelector("#copy-result-button").addEventListener("click", copyResult);
+document.querySelector("#share-emoji-button").addEventListener("click", shareEmojiResult);
 
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js"));
 
