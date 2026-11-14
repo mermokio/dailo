@@ -36,14 +36,21 @@ const els = {
   historyList: document.querySelector("#history-list"),
   statPlayed: document.querySelector("#stat-played"),
   statWinRate: document.querySelector("#stat-win-rate"),
-  statStreak: document.querySelector("#stat-streak"),
-  installBanner: document.querySelector("#install-banner")
+  statStreak: document.querySelector("#stat-streak")
 };
 
 let state = loadState();
 let activeGame = Number(state.activeGame) || 0;
 let isAnimating = false;
-let installPrompt = null;
+
+function syncViewportHeight() {
+  const height = window.visualViewport?.height || window.innerHeight;
+  document.documentElement.style.setProperty("--app-height", `${Math.round(height)}px`);
+}
+
+syncViewportHeight();
+window.addEventListener("resize", syncViewportHeight);
+window.visualViewport?.addEventListener("resize", syncViewportHeight);
 
 function loadState() {
   const fallback = { activeGame: 0, days: {} };
@@ -468,23 +475,6 @@ els.shareButton.addEventListener("click", () => { drawShareCard(); openModal(els
 document.querySelector("#native-share-button").addEventListener("click", shareImage);
 document.querySelector("#save-image-button").addEventListener("click", saveImage);
 document.querySelector("#copy-result-button").addEventListener("click", copyResult);
-
-window.addEventListener("beforeinstallprompt", (event) => {
-  event.preventDefault();
-  installPrompt = event;
-  if (!localStorage.getItem("dailo-install-dismissed")) els.installBanner.hidden = false;
-});
-document.querySelector("#install-button").addEventListener("click", async () => {
-  if (!installPrompt) return;
-  installPrompt.prompt();
-  await installPrompt.userChoice;
-  installPrompt = null;
-  els.installBanner.hidden = true;
-});
-document.querySelector("#install-dismiss").addEventListener("click", () => {
-  localStorage.setItem("dailo-install-dismissed", "true");
-  els.installBanner.hidden = true;
-});
 
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js"));
 
