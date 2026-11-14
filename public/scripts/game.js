@@ -76,11 +76,27 @@ export function buildKeyboardState(guesses, answer) {
   return keyboard;
 }
 
-export function emptyGameState() {
-  return { guesses: [], draft: "", status: "playing", completedAt: null };
-}
-
 export function resultEmojiRows(guesses, answer) {
   const emoji = { correct: "🟩", present: "🟨", absent: "⬛" };
   return guesses.map((guess) => scoreGuess(guess, answer).map((state) => emoji[state]).join(""));
+}
+
+export function normalizeDraft(draft) {
+  const source = Array.isArray(draft) ? draft : typeof draft === "string" ? [...draft] : [];
+  return Array.from({ length: WORD_LENGTH }, (_, index) => {
+    const letter = source[index];
+    return typeof letter === "string" && /^[a-z]$/i.test(letter) ? letter.toLowerCase() : "";
+  });
+}
+
+export function findEmptyDraftSlot(draft, startIndex = 0) {
+  for (let offset = 0; offset < WORD_LENGTH; offset += 1) {
+    const index = (startIndex + offset + WORD_LENGTH) % WORD_LENGTH;
+    if (!draft[index]) return index;
+  }
+  return -1;
+}
+
+export function emptyGameState() {
+  return { guesses: [], draft: normalizeDraft([]), status: "playing", completedAt: null };
 }

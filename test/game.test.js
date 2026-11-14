@@ -2,9 +2,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   buildKeyboardState,
+  emptyGameState,
+  findEmptyDraftSlot,
   getDailyAnswers,
   hashString,
   localDateKey,
+  normalizeDraft,
   resultEmojiRows,
   scoreGuess
 } from "../public/scripts/game.js";
@@ -40,4 +43,12 @@ test("keyboard keeps the strongest known state", () => {
 
 test("emoji output reflects scored guesses", () => {
   assert.deepEqual(resultEmojiRows(["cider"], "cider"), ["🟩🟩🟩🟩🟩"]);
+});
+
+test("draft slots support arbitrary-order entry and legacy drafts", () => {
+  assert.deepEqual(emptyGameState().draft, ["", "", "", "", ""]);
+  assert.deepEqual(normalizeDraft("cr"), ["c", "r", "", "", ""]);
+  const slots = normalizeDraft(["c", "", "d", "", "e"]);
+  assert.equal(findEmptyDraftSlot(slots, 2), 3);
+  assert.equal(findEmptyDraftSlot(slots, 4), 1);
 });

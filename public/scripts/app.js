@@ -5,8 +5,10 @@ import {
   WORD_LENGTH,
   buildKeyboardState,
   emptyGameState,
+  findEmptyDraftSlot,
   getDailyAnswers,
   localDateKey,
+  normalizeDraft,
   resultEmojiRows,
   scoreGuess
 } from "./game.js";
@@ -44,6 +46,7 @@ const els = {
 
 let state = loadState();
 let activeGame = Number(state.activeGame) || 0;
+let selectedTileIndex = 0;
 let isAnimating = false;
 let viewportSyncFrame = 0;
 
@@ -90,6 +93,11 @@ function loadState() {
 function todayState() {
   state.days[today] ||= { games: Array.from({ length: GAMES_PER_DAY }, emptyGameState) };
   while (state.days[today].games.length < GAMES_PER_DAY) state.days[today].games.push(emptyGameState());
+  state.days[today].games.forEach((game) => {
+    if (!Array.isArray(game.draft) || game.draft.length !== WORD_LENGTH || game.draft.some((letter) => letter && !/^[a-z]$/.test(letter))) {
+      game.draft = normalizeDraft(game.draft);
+    }
+  });
   return state.days[today];
 }
 
@@ -118,7 +126,7 @@ function render() {
   renderMessage(game, answer);
   renderStats();
   els.shareButton.hidden = game.status === "playing";
-  els.submitButton.disabled = game.status !== "playing" || game.draft.length !== WORD_LENGTH;
+  els.submitButton.disabled = game.status !== "playing" || game.draft.some((letter) => !letter);
 }
 
 function renderBoard(game, answer) {
@@ -128,16 +136,26 @@ function renderBoard(game, answer) {
     row.className = "board-row";
     row.dataset.row = rowIndex;
     const submitted = game.guesses[rowIndex];
-    const draft = rowIndex === game.guesses.length && game.status === "playing" ? game.draft : "";
-    const letters = submitted || draft || "";
+    const isDraftRow = rowIndex === game.guesses.length && game.status === "playing";
+    const draft = isDraftRow ? game.draft : [];
     const score = submitted ? scoreGuess(submitted, answer) : [];
 
     for (let column = 0; column < WORD_LENGTH; column += 1) {
       const tile = document.createElement("div");
-      const letter = letters[column] || "";
+      const letter = submitted ? submitted[column] : draft[column] || "";
       tile.className = "tile";
       tile.dataset.column = column;
+      tile.dataset.row = rowIndex;
       if (letter) tile.classList.add("has-letter");
+      if (isDraftRow) {
+        tile.tabIndex = 0;
+        tile.setAttribute("role", "button");
+        tile.setAttribute("aria-label", `Letter slot ${column + 1}${letter ? `, ${letter.toUpperCase()}` : ", empty"}`);
+        tile.setAttribute("aria-pressed", String(column === selectedTileIndex));
+        if (column === selectedTileIndex) tile.classList.add("selected");
+      } else {
+        tile.tabIndex = -1;
+      }
       if (submitted) tile.classList.add(score[column]);
       tile.textContent = letter;
       row.append(tile);
@@ -200,7 +218,7 @@ function renderMessage(game, answer) {
   } else if (game.status === "lost") {
     els.gameMessage.innerHTML = `<span>Today's word was <strong>${answer.toUpperCase()}</strong></span>`;
   } else {
-    els.gameMessage.innerHTML = "<span>Guess a five-letter word</span>";
+    els.gameMessage.innerHTML = "<span>Tap a tile to place letters in any order</span>";
   }
 }
 
@@ -210,7 +228,15 @@ function handleInput(key) {
   if (game.status !== "playing") return;
 
   if (key === "backspace") {
-    game.draft = game.draft.slice(0, -1);
+    let target = selectedTileIndex;
+    if (!game.draft[target]) {
+      for (let offset = 1; offset < WORD_LENGTH; offset += 1) {
+        const previous = (selectedTileIndex - offset + WORD_LENGTH) % WORD_LENGTH;
+        if (game.draft[previous]) { target = previous; break; }
+      }
+    }
+    game.draft[target] = "";
+    selectedTileIndex = target;
     saveState();
     render();
     return;
@@ -221,31 +247,35 @@ function handleInput(key) {
     return;
   }
 
-  if (/^[a-z]$/.test(key) && game.draft.length < WORD_LENGTH) {
-    game.draft += key;
+  if (/^[a-z]$/.test(key)) {
+    const enteredIndex = selectedTileIndex;
+    game.draft[enteredIndex] = key;
+    selectedTileIndex = findEmptyDraftSlot(game.draft, (enteredIndex + 1) % WORD_LENGTH);
+    if (selectedTileIndex === -1) selectedTileIndex = enteredIndex;
     saveState();
     render();
-    const tile = els.board.querySelector(`[data-row="${game.guesses.length}"] [data-column="${game.draft.length - 1}"]`);
+    const tile = els.board.querySelector(`[data-row="${game.guesses.length}"] [data-column="${enteredIndex}"]`);
     tile?.classList.add("pop");
   }
 }
 
 async function submitGuess() {
   const game = currentGame();
-  if (game.draft.length < WORD_LENGTH) {
+  if (game.draft.some((letter) => !letter)) {
     rejectRow("Not enough letters");
     return;
   }
-  if (!validWords.has(game.draft)) {
+  const guess = game.draft.join("");
+  if (!validWords.has(guess)) {
     rejectRow("Not in Dailo's word list");
     return;
   }
 
-  const guess = game.draft;
   const answer = dailyAnswers[activeGame];
   const rowIndex = game.guesses.length;
   game.guesses.push(guess);
-  game.draft = "";
+  game.draft = normalizeDraft([]);
+  selectedTileIndex = 0;
   if (guess === answer) {
     game.status = "won";
     game.completedAt = new Date().toISOString();
@@ -500,6 +530,32 @@ function openModal(modal) {
 
 function wait(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
 
+function selectDraftTile(index) {
+  const game = currentGame();
+  if (game.status !== "playing" || isAnimating) return;
+  selectedTileIndex = index;
+  els.board.querySelectorAll(".tile[data-row]").forEach((tile) => {
+    const selected = Number(tile.dataset.row) === game.guesses.length && Number(tile.dataset.column) === selectedTileIndex;
+    tile.classList.toggle("selected", selected);
+    if (tile.hasAttribute("aria-pressed")) tile.setAttribute("aria-pressed", String(selected));
+  });
+}
+
+els.board.addEventListener("click", (event) => {
+  const tile = event.target.closest(".tile[data-row][data-column]");
+  if (!tile || Number(tile.dataset.row) !== currentGame().guesses.length) return;
+  selectDraftTile(Number(tile.dataset.column));
+});
+
+els.board.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const tile = event.target.closest(".tile[data-row][data-column]");
+  if (!tile || Number(tile.dataset.row) !== currentGame().guesses.length) return;
+  event.preventDefault();
+  event.stopPropagation();
+  selectDraftTile(Number(tile.dataset.column));
+});
+
 els.keyboard.addEventListener("click", (event) => {
   const key = event.target.closest("[data-key]");
   if (!key) return;
@@ -524,6 +580,8 @@ els.gameSwitcher.addEventListener("click", (event) => {
   const button = event.target.closest("[data-game]");
   if (!button || button.disabled || isAnimating) return;
   activeGame = Number(button.dataset.game);
+  selectedTileIndex = findEmptyDraftSlot(currentGame().draft);
+  if (selectedTileIndex === -1) selectedTileIndex = WORD_LENGTH - 1;
   saveState();
   render();
 });
@@ -552,5 +610,7 @@ if ("serviceWorker" in navigator) window.addEventListener("load", () => navigato
 
 const gamesToday = todayState().games;
 activeGame = Math.max(0, Math.min(activeGame, nextPlayableGameIndex(gamesToday)));
+selectedTileIndex = findEmptyDraftSlot(gamesToday[activeGame].draft);
+if (selectedTileIndex === -1) selectedTileIndex = WORD_LENGTH - 1;
 saveState();
 render();

@@ -53,7 +53,7 @@ body {
 
 button, a { -webkit-tap-highlight-color: transparent; }
 button { font: inherit; }
-button:focus-visible, a:focus-visible {
+button:focus-visible, a:focus-visible, [role="button"]:focus-visible {
   outline: 3px solid var(--yellow);
   outline-offset: 3px;
 }
@@ -283,6 +283,7 @@ main {
 }
 
 .tile.has-letter { border-color: rgba(255, 255, 255, 0.35); }
+.tile.selected { z-index: 1; outline: 2px solid var(--lime); outline-offset: 2px; }
 .tile.pop { animation: tile-pop 150ms ease; }
 .tile.shake { animation: row-shake 450ms ease; }
 .tile.reveal { animation: tile-flip 620ms cubic-bezier(.2,.8,.2,1); }
@@ -615,6 +616,7 @@ main {
     color: #26382b;
   }
   .tile.has-letter { border-color: rgba(47, 79, 56, 0.42); }
+  .tile.selected { outline-color: var(--lime-dark); }
   .tile.correct { border-color: var(--lime-dark); background: var(--lime-dark); color: #fff; }
   .tile.present { border-color: var(--yellow-dark); background: var(--yellow-dark); color: #fff; }
   .tile.absent { border-color: #c8d0ca; background: #c8d0ca; color: #526159; }
