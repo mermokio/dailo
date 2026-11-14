@@ -63,11 +63,11 @@
             <span>01</span><i aria-label="Not started"></i>
           </button>
           <div class="game-rail" aria-hidden="true"></div>
-          <button class="game-pill" type="button" data-game="1">
+          <button class="game-pill" type="button" data-game="1" disabled>
             <span>02</span><i aria-label="Not started"></i>
           </button>
           <div class="game-rail" aria-hidden="true"></div>
-          <button class="game-pill" type="button" data-game="2">
+          <button class="game-pill" type="button" data-game="2" disabled>
             <span>03</span><i aria-label="Not started"></i>
           </button>
         </nav>
@@ -84,28 +84,19 @@
             <span>Guess a five-letter word</span>
           </div>
 
-          <div class="game-actions" id="game-actions" hidden>
-            <button class="share-result-button" id="share-result-button" type="button">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.1c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.03-.47-.09-.7l7.05-4.11A2.99 2.99 0 1 0 15 5c0 .24.04.47.09.7L8.04 9.81A3 3 0 1 0 6 15c.79 0 1.5-.31 2.04-.81l7.09 4.14c-.05.21-.08.43-.08.67a2.95 2.95 0 1 0 2.95-2.9Z"/></svg>
-              Share this game
-            </button>
-            <button class="done-for-now-button" id="done-for-now-button" type="button">Done for today</button>
-          </div>
+          <button class="share-result-button" id="share-result-button" type="button" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.1c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.03-.47-.09-.7l7.05-4.11A2.99 2.99 0 1 0 15 5c0 .24.04.47.09.7L8.04 9.81A3 3 0 1 0 6 15c.79 0 1.5-.31 2.04-.81l7.09 4.14c-.05.21-.08.43-.08.67a2.95 2.95 0 1 0 2.95-2.9Z"/></svg>
+            Share this game
+          </button>
         </section>
 
         <section class="keyboard-wrap" aria-label="On-screen keyboard">
+          <button class="submit-guess-button" id="submit-guess-button" type="button" disabled>Submit guess</button>
           <div class="keyboard" id="keyboard"></div>
         </section>
 
         <p class="privacy-note" id="privacy-note"><span aria-hidden="true">✦</span> No account. No ads. Your history stays on this device.</p>
 
-        <section class="day-done" id="day-done" aria-live="polite" hidden>
-          <span class="day-done-icon" aria-hidden="true">✦</span>
-          <p class="eyebrow">A good place to pause</p>
-          <h2>You’re all set for today.</h2>
-          <p>Your progress is saved. The other words will be here whenever you feel like coming back.</p>
-          <button class="secondary-button" id="return-to-games-button" type="button">Return to today’s games</button>
-        </section>
       </main>
     </div>
 

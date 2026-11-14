@@ -12,7 +12,7 @@ import {
 } from "./game.js";
 
 const STORAGE_KEY = "dailo-state-v1";
-const KEYBOARD_ROWS = ["qwertyuiop", "asdfghjkl", "enterzxcvbnmbackspace"];
+const KEYBOARD_ROWS = ["qwertyuiop", "asdfghjkl", ["z", "x", "c", "v", "b", "n", "m", "backspace"]];
 const validWords = new Set(all);
 const today = localDateKey();
 const dailyAnswers = getDailyAnswers(today, answers);
@@ -25,12 +25,8 @@ const els = {
   gameProgress: document.querySelector("#game-progress"),
   gameMessage: document.querySelector("#game-message"),
   gameSwitcher: document.querySelector("#game-switcher"),
-  gameCard: document.querySelector(".game-card"),
-  keyboardWrap: document.querySelector(".keyboard-wrap"),
-  privacyNote: document.querySelector("#privacy-note"),
-  dayDone: document.querySelector("#day-done"),
-  gameActions: document.querySelector("#game-actions"),
   shareButton: document.querySelector("#share-result-button"),
+  submitButton: document.querySelector("#submit-guess-button"),
   toast: document.querySelector("#toast"),
   confetti: document.querySelector("#confetti"),
   streakCount: document.querySelector("#streak-count"),
@@ -47,7 +43,6 @@ const els = {
 let state = loadState();
 let activeGame = Number(state.activeGame) || 0;
 let isAnimating = false;
-let isDoneForToday = false;
 let viewportSyncFrame = 0;
 
 function syncViewportHeight() {
@@ -120,12 +115,8 @@ function render() {
   renderSwitcher();
   renderMessage(game, answer);
   renderStats();
-  els.gameActions.hidden = game.status === "playing" || isDoneForToday;
-  els.gameSwitcher.hidden = isDoneForToday;
-  els.gameCard.hidden = isDoneForToday;
-  els.keyboardWrap.hidden = isDoneForToday;
-  els.privacyNote.hidden = isDoneForToday;
-  els.dayDone.hidden = !isDoneForToday;
+  els.shareButton.hidden = game.status === "playing";
+  els.submitButton.disabled = game.status !== "playing" || game.draft.length !== WORD_LENGTH;
 }
 
 function renderBoard(game, answer) {
@@ -156,18 +147,18 @@ function renderBoard(game, answer) {
 function renderKeyboard(game, answer) {
   const keyStates = buildKeyboardState(game.guesses, answer);
   els.keyboard.replaceChildren();
-  KEYBOARD_ROWS.forEach((row, rowIndex) => {
+  KEYBOARD_ROWS.forEach((row) => {
     const rowEl = document.createElement("div");
     rowEl.className = "keyboard-row";
-    const keys = rowIndex === 2 ? ["enter", ..."zxcvbnm", "backspace"] : [...row];
+    const keys = Array.isArray(row) ? row : [...row];
     keys.forEach((key) => {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "key";
       button.dataset.key = key;
-      if (key === "enter" || key === "backspace") button.classList.add("wide");
+      if (key === "backspace") button.classList.add("wide");
       if (keyStates[key]) button.classList.add(keyStates[key]);
-      button.setAttribute("aria-label", key === "backspace" ? "Delete letter" : key === "enter" ? "Submit guess" : key.toUpperCase());
+      button.setAttribute("aria-label", key === "backspace" ? "Delete letter" : key.toUpperCase());
       if (key === "backspace") {
         button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.12c.36.53.9.88 1.59.88h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59Z"/></svg>';
       } else {
@@ -181,14 +172,23 @@ function renderKeyboard(game, answer) {
 
 function renderSwitcher() {
   const games = todayState().games;
+  const unlockedThrough = nextPlayableGameIndex(games);
   els.gameSwitcher.querySelectorAll(".game-pill").forEach((button, index) => {
     const game = games[index];
+    button.disabled = index > unlockedThrough;
     button.classList.toggle("is-active", index === activeGame);
     button.toggleAttribute("aria-current", index === activeGame);
     button.dataset.status = game.status !== "playing" ? game.status : game.guesses.length ? "playing" : "not-started";
     const indicator = button.querySelector("i");
     indicator.setAttribute("aria-label", game.status === "won" ? "Won" : game.status === "lost" ? "Not solved" : game.guesses.length ? "In progress" : "Not started");
+    button.title = button.disabled ? `Finish game ${index} before starting this game` : `Open game ${index + 1}`;
+    button.setAttribute("aria-label", button.disabled ? `Game ${index + 1}, locked until game ${index} is finished` : `Game ${index + 1}`);
   });
+}
+
+function nextPlayableGameIndex(games) {
+  const nextPlaying = games.findIndex((game) => game.status === "playing");
+  return nextPlaying === -1 ? GAMES_PER_DAY - 1 : nextPlaying;
 }
 
 function renderMessage(game, answer) {
@@ -530,7 +530,7 @@ document.addEventListener("keydown", (event) => {
 
 els.gameSwitcher.addEventListener("click", (event) => {
   const button = event.target.closest("[data-game]");
-  if (!button || isAnimating) return;
+  if (!button || button.disabled || isAnimating) return;
   activeGame = Number(button.dataset.game);
   saveState();
   render();
@@ -552,20 +552,14 @@ els.shareButton.addEventListener("click", () => {
     toast("Couldn't create the share image. Please try again.");
   }
 });
-document.querySelector("#done-for-now-button").addEventListener("click", () => {
-  isDoneForToday = true;
-  render();
-});
-document.querySelector("#return-to-games-button").addEventListener("click", () => {
-  isDoneForToday = false;
-  render();
-});
+els.submitButton.addEventListener("click", submitGuess);
 document.querySelector("#native-share-button").addEventListener("click", shareImage);
 document.querySelector("#save-image-button").addEventListener("click", saveImage);
 document.querySelector("#copy-result-button").addEventListener("click", copyResult);
 
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js"));
 
-todayState();
+const gamesToday = todayState().games;
+activeGame = Math.max(0, Math.min(activeGame, nextPlayableGameIndex(gamesToday)));
 saveState();
 render();
