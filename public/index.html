@@ -3,12 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#111827" />
+    <meta name="theme-color" content="#111827" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f8faf6" media="(prefers-color-scheme: light)" />
     <meta name="description" content="Dailo is your daily trio of beautifully bite-sized word games." />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Dailo" />
     <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
     <link rel="icon" href="./assets/icon-192.png" sizes="192x192" />
     <link rel="apple-touch-icon" href="./assets/icon-192.png" />
     <link rel="preload" href="./assets/words.js" as="script" crossorigin />
@@ -26,7 +28,13 @@
         </button>
 
         <a class="brand" href="./" aria-label="Dailo home">
-          <span class="brand-mark" aria-hidden="true"><i>D</i></span>
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 48 48" focusable="false">
+              <rect x="3" y="3" width="42" height="42" rx="15" fill="#E8F4D8" />
+              <path d="M17 13h5.5c7 0 11.5 4.4 11.5 11s-4.5 11-11.5 11H17V13Z" fill="none" stroke="#497C56" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.6" />
+              <circle cx="34" cy="14" r="3" fill="#E7B95B" />
+            </svg>
+          </span>
           <span class="brand-copy">
             <strong>Dailo</strong>
             <small>your daily word trio</small>

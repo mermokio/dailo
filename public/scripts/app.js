@@ -42,15 +42,35 @@ const els = {
 let state = loadState();
 let activeGame = Number(state.activeGame) || 0;
 let isAnimating = false;
+let viewportSyncFrame = 0;
 
 function syncViewportHeight() {
-  const height = window.visualViewport?.height || window.innerHeight;
-  document.documentElement.style.setProperty("--app-height", `${Math.round(height)}px`);
+  cancelAnimationFrame(viewportSyncFrame);
+  viewportSyncFrame = requestAnimationFrame(() => {
+    const height = window.visualViewport?.height || window.innerHeight;
+    document.documentElement.style.setProperty("--app-height", `${Math.round(height)}px`);
+    requestAnimationFrame(() => {
+      const settledHeight = window.visualViewport?.height || window.innerHeight;
+      document.documentElement.style.setProperty("--app-height", `${Math.round(settledHeight)}px`);
+    });
+  });
+}
+
+function syncThemeColor() {
+  const lightColor = document.querySelector('meta[name="theme-color"][media*="light"]');
+  const darkColor = document.querySelector('meta[name="theme-color"][media*="dark"]');
+  if (lightColor) lightColor.content = "#f8faf6";
+  if (darkColor) darkColor.content = "#111827";
 }
 
 syncViewportHeight();
+const colorScheme = window.matchMedia("(prefers-color-scheme: light)");
+syncThemeColor(colorScheme);
+colorScheme.addEventListener?.("change", syncThemeColor);
 window.addEventListener("resize", syncViewportHeight);
+window.addEventListener("orientationchange", syncViewportHeight);
 window.visualViewport?.addEventListener("resize", syncViewportHeight);
+window.visualViewport?.addEventListener("scroll", syncViewportHeight);
 
 function loadState() {
   const fallback = { activeGame: 0, days: {} };
