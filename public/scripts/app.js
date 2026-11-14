@@ -16,6 +16,8 @@ const KEYBOARD_ROWS = ["qwertyuiop", "asdfghjkl", ["z", "x", "c", "v", "b", "n",
 const validWords = new Set(all);
 const today = localDateKey();
 const dailyAnswers = getDailyAnswers(today, answers);
+const shareIcon = new Image();
+shareIcon.src = new URL("../assets/icon-lighthouse-512.png", import.meta.url).href;
 
 const els = {
   board: document.querySelector("#board"),
@@ -360,13 +362,20 @@ function shareText() {
   return `Dailo ${today} · ${activeGame + 1}/3 · ${score}/${MAX_GUESSES}\n\n${rows.join("\n")}\n\nPlay today's trio`;
 }
 
-function drawShareCard() {
+async function drawShareCard() {
   const canvas = els.shareCanvas;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas is not available");
+  if (!shareIcon.complete) {
+    await new Promise((resolve, reject) => {
+      shareIcon.addEventListener("load", resolve, { once: true });
+      shareIcon.addEventListener("error", reject, { once: true });
+    });
+  }
+  if (!shareIcon.naturalWidth) throw new Error("The Dailo share icon could not be loaded");
   const game = currentGame();
   const answer = dailyAnswers[activeGame];
-  const rows = game.guesses.map((guess) => scoreGuess(guess, answer));
+  const rows = game.guesses.map((guess) => ({ guess, score: scoreGuess(guess, answer) }));
   ctx.fillStyle = "#111827";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   const glow = ctx.createRadialGradient(540, 0, 0, 540, 0, 680);
@@ -375,13 +384,7 @@ function drawShareCard() {
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, canvas.width, 800);
 
-  ctx.fillStyle = "#a3e635";
-  roundRect(ctx, 100, 94, 118, 118, 30);
-  ctx.fill();
-  ctx.fillStyle = "#111827";
-  ctx.font = "800 74px system-ui";
-  ctx.textAlign = "center";
-  ctx.fillText("D", 159, 178);
+  ctx.drawImage(shareIcon, 100, 94, 118, 118);
   ctx.textAlign = "left";
   ctx.fillStyle = "#fffdf7";
   ctx.font = "800 70px system-ui";
@@ -406,9 +409,14 @@ function drawShareCard() {
       const x = startX + column * (size + gap);
       const y = startY + rowIndex * (size + gap);
       if (row) {
-        ctx.fillStyle = row[column] === "correct" ? "#5f9513" : row[column] === "present" ? "#9a7610" : "#3b4658";
+        ctx.fillStyle = row.score[column] === "correct" ? "#5f9513" : row.score[column] === "present" ? "#9a7610" : "#3b4658";
         roundRect(ctx, x, y, size, size, 20);
         ctx.fill();
+        ctx.fillStyle = "#fffdf7";
+        ctx.font = "800 58px system-ui";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(row.guess[column].toUpperCase(), x + size / 2, y + size / 2);
       } else {
         ctx.lineWidth = 3;
         ctx.strokeStyle = "rgba(255,255,255,.12)";
@@ -442,7 +450,7 @@ function roundRect(ctx, x, y, width, height, radius) {
 }
 
 async function canvasBlob() {
-  drawShareCard();
+  await drawShareCard();
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   const canvas = els.shareCanvas;
   const blob = typeof canvas.toBlob === "function"
@@ -459,7 +467,7 @@ async function shareImage() {
   try {
     blob = await canvasBlob();
   } catch {
-    toast("Couldn't create the share image. Try saving it instead.");
+    toast("Couldn't create the share image. Please try again.");
     return;
   }
   const file = new File([blob], `dailo-${today}-${activeGame + 1}.png`, { type: "image/png" });
@@ -471,26 +479,16 @@ async function shareImage() {
       if (error.name === "AbortError") return;
     }
   }
-  downloadBlob(blob);
-  toast("Image saved — ready to share");
-}
-
-async function saveImage() {
-  try {
-    downloadBlob(await canvasBlob());
-    toast("Share image saved");
-  } catch {
-    toast("Couldn't save the share image. Please try again.");
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: "My Dailo", text: shareText() });
+      toast("Shared the emoji result instead; image sharing isn't supported here.");
+      return;
+    } catch (error) {
+      if (error.name === "AbortError") return;
+    }
   }
-}
-
-function downloadBlob(blob) {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `dailo-${today}-${activeGame + 1}.png`;
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast("Image sharing isn't supported here. You can copy the emoji result instead.");
 }
 
 async function copyResult() {
@@ -544,9 +542,9 @@ document.querySelectorAll("dialog").forEach((dialog) => dialog.addEventListener(
   if (event.target === dialog) dialog.close();
 }));
 
-els.shareButton.addEventListener("click", () => {
+els.shareButton.addEventListener("click", async () => {
   try {
-    drawShareCard();
+    await drawShareCard();
     openModal(els.shareModal);
   } catch {
     toast("Couldn't create the share image. Please try again.");
@@ -554,7 +552,6 @@ els.shareButton.addEventListener("click", () => {
 });
 els.submitButton.addEventListener("click", submitGuess);
 document.querySelector("#native-share-button").addEventListener("click", shareImage);
-document.querySelector("#save-image-button").addEventListener("click", saveImage);
 document.querySelector("#copy-result-button").addEventListener("click", copyResult);
 
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js"));
