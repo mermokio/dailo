@@ -419,7 +419,8 @@ function hasWin(dateKey) {
 function replayUrl() {
   const token = encodeReplayToken(today, activeGame, currentGame().guesses, dailyAnswers[activeGame]);
   const url = new URL("./replay.html", window.location.href);
-  url.hash = new URLSearchParams({ r: token }).toString();
+  // Keep the payload in the query string: some mobile share previews discard URL fragments.
+  url.searchParams.set("r", token);
   return url.href;
 }
 

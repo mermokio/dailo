@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import vm from "node:vm";
 
 test("install promotion is completely removed", async () => {
   const [html, app, css] = await Promise.all([
@@ -70,12 +71,64 @@ test("share image sends only a file and emoji share links to a reveal replay", a
   assert.match(app, /navigator\.share\(\{ files: \[file\] \}\)/);
   assert.doesNotMatch(app, /navigator\.share\(\{ title: "My Dailo", text: shareText\(\), files:/);
   assert.match(app, /new URL\("\.\/replay\.html", window\.location\.href\)/);
+  assert.match(app, /url\.searchParams\.set\("r", token\)/);
   assert.match(app, /\$\{replayLink\}/);
   assert.match(replayHtml, /id="reveal-button"[^>]*>Reveal guessed letters/);
-  assert.match(replayScript, /decodeReplayToken/);
+  assert.match(replayHtml, /<script defer src="\.\/scripts\/replay\.js"><\/script>/);
+  assert.match(replayScript, /search\.get\("r"\) \|\| fragment\.get\("r"\)/);
   assert.match(replayScript, /tile\.textContent = letter/);
+  assert.doesNotMatch(replayScript, /^import\s/m);
   assert.match(serviceWorker, /"\.\/replay\.html"/);
   assert.match(serviceWorker, /"\.\/scripts\/replay\.js"/);
+});
+
+test("shared replay link paints colored guesses before reveal and reveals on tap", async () => {
+  const source = await readFile(new URL("../public/scripts/replay.js", import.meta.url), "utf8");
+  const token = "eyJ2IjoxLCJkIjoiMjAyNi0xMS0xNSIsImciOjAsImwiOlsiaGFycHMiLCJkdWNrcyIsImR1bmNlIl0sInIiOlsiMDAwMDAiLCIyMjEwMCIsIjIyMjIyIl19";
+  class Element {
+    constructor() {
+      this.children = [];
+      this.dataset = {};
+      this.attributes = {};
+      this.classes = new Set();
+      this.classList = { add: (name) => this.classes.add(name), contains: (name) => this.classes.has(name) };
+      this.hidden = false;
+      this.textContent = "";
+    }
+    append(child) { this.children.push(child); }
+    setAttribute(name, value) { this.attributes[name] = value; }
+    addEventListener(name, callback) { this.listeners ??= {}; this.listeners[name] = callback; }
+    querySelectorAll(selector) {
+      assert.equal(selector, ".replay-tile[data-row]");
+      return this.children.flatMap((row) => row.children).filter((tile) => tile.dataset.row !== undefined);
+    }
+  }
+  const elements = Object.fromEntries(["replay-root", "replay-board", "replay-meta", "replay-help", "reveal-button", "replay-error"].map((id) => [id, new Element()]));
+  vm.runInNewContext(source, {
+    URLSearchParams,
+    atob,
+    Date,
+    Intl,
+    location: { search: "", hash: `#r=${token}` },
+    document: {
+      querySelector: (selector) => elements[selector.slice(1)],
+      createElement: () => new Element()
+    }
+  });
+
+  const board = elements["replay-board"];
+  const tiles = board.children.flatMap((row) => row.children);
+  assert.equal(board.children.length, 6);
+  assert.equal(tiles.length, 30);
+  assert.deepEqual([...tiles.slice(0, 5)].map((tile) => [...tile.classes][0]), Array(5).fill("absent"));
+  assert.deepEqual([...tiles.slice(5, 10)].map((tile) => [...tile.classes][0]), ["correct", "correct", "present", "absent", "absent"]);
+  assert.ok(tiles.every((tile) => tile.textContent === ""));
+
+  elements["reveal-button"].listeners.click();
+  assert.equal(tiles[0].textContent, "H");
+  assert.equal(tiles[5].textContent, "D");
+  assert.equal(tiles[10].textContent, "D");
+  assert.equal(elements["reveal-button"].disabled, true);
 });
 
 test("submit is hidden only when the selected game is finished", async () => {
