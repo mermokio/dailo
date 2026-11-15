@@ -37,17 +37,15 @@ test("game viewport uses height-aware, scroll-free sizing", async () => {
   assert.match(css, /safe-area-inset-bottom/);
 });
 
-test("folded split layout is gated by posture and stacked segments", async () => {
+test("top-bottom fold layout is gated by stacked viewport segments", async () => {
   const [html, app, css] = await Promise.all([
     readFile(new URL("../public/index.html", import.meta.url), "utf8"),
     readFile(new URL("../public/scripts/app.js", import.meta.url), "utf8"),
     readFile(new URL("../public/styles.css", import.meta.url), "utf8")
   ]);
-  assert.match(app, /navigator\.devicePosture\?\.type === "folded"/);
-  assert.match(app, /matchMedia\("\(device-posture: folded\)"\)/);
   assert.match(app, /matchMedia\("\(vertical-viewport-segments: 2\)"\)/);
-  assert.match(app, /folded && stacked/);
-  assert.match(app, /foldedPostureQuery\.addEventListener\?\.\("change", syncFoldLayout\)/);
+  assert.match(app, /document\.body\.classList\.toggle\("folded-stacked-mode", stacked\)/);
+  assert.doesNotMatch(app, /folded && stacked/);
   assert.match(app, /stackedSegmentsQuery\.addEventListener\?\.\("change", syncFoldLayout\)/);
   assert.match(html, /class="top-screen"[\s\S]*?class="bottom-screen"/);
   assert.match(css, /body\.folded-stacked-mode \.top-screen/);

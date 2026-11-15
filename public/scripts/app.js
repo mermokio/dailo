@@ -70,7 +70,6 @@ function syncThemeColor() {
   if (darkColor) darkColor.content = "#111827";
 }
 
-const foldedPostureQuery = window.matchMedia("(device-posture: folded)");
 const stackedSegmentsQuery = window.matchMedia("(vertical-viewport-segments: 2)");
 
 syncViewportHeight();
@@ -91,14 +90,10 @@ function hasVerticallyStackedSegments() {
 }
 
 function syncFoldLayout() {
-  let folded = false;
-  try {
-    folded = navigator.devicePosture?.type === "folded" || foldedPostureQuery.matches;
-  } catch {
-    folded = foldedPostureQuery.matches;
-  }
   const stacked = stackedSegmentsQuery.matches || hasVerticallyStackedSegments();
-  document.body.classList.toggle("folded-stacked-mode", folded && stacked);
+  // Two stacked viewport segments are sufficient to identify the requested
+  // top/bottom layout, even if Safari does not expose Device Posture yet.
+  document.body.classList.toggle("folded-stacked-mode", stacked);
 }
 
 syncFoldLayout();
@@ -110,7 +105,6 @@ try {
 window.addEventListener("resize", syncFoldLayout);
 window.addEventListener("orientationchange", syncFoldLayout);
 window.visualViewport?.addEventListener("resize", syncFoldLayout);
-foldedPostureQuery.addEventListener?.("change", syncFoldLayout);
 stackedSegmentsQuery.addEventListener?.("change", syncFoldLayout);
 
 function loadState() {
