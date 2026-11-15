@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  areVerticallyStackedSegments,
   buildKeyboardState,
   emptyGameState,
   findEmptyDraftSlot,
@@ -51,4 +52,13 @@ test("draft slots support arbitrary-order entry and legacy drafts", () => {
   const slots = normalizeDraft(["c", "", "d", "", "e"]);
   assert.equal(findEmptyDraftSlot(slots, 2), 3);
   assert.equal(findEmptyDraftSlot(slots, 4), 1);
+});
+
+test("fold layout activates only for two vertically stacked segments", () => {
+  const top = { left: 0, right: 400, top: 0, bottom: 390, width: 400 };
+  const bottom = { left: 0, right: 400, top: 410, bottom: 800, width: 400 };
+  const right = { left: 420, right: 820, top: 0, bottom: 390, width: 400 };
+  assert.equal(areVerticallyStackedSegments([top, bottom]), true);
+  assert.equal(areVerticallyStackedSegments([top, right]), false);
+  assert.equal(areVerticallyStackedSegments([top]), false);
 });

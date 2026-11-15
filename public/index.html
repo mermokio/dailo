@@ -21,7 +21,8 @@
     <div class="ambient ambient-two" aria-hidden="true"></div>
 
     <div class="app-shell">
-      <header class="topbar">
+      <div class="top-screen">
+        <header class="topbar">
         <button class="icon-button" id="help-button" type="button" aria-label="How to play">
           <span aria-hidden="true">?</span>
         </button>
@@ -39,9 +40,9 @@
         <button class="icon-button" id="stats-button" type="button" aria-label="Game history and statistics">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20v-7h3v7H5Zm5.5 0V4h3v16h-3ZM16 20v-11h3v11h-3Z"/></svg>
         </button>
-      </header>
+        </header>
 
-      <main>
+        <main>
         <section class="day-heading" aria-labelledby="today-label">
           <div>
             <p class="eyebrow" id="today-label">Today's trio</p>
@@ -84,15 +85,16 @@
             Share this game
           </button>
         </section>
+        </main>
+      </div>
 
+      <div class="bottom-screen">
         <section class="keyboard-wrap" aria-label="On-screen keyboard">
           <button class="submit-guess-button" id="submit-guess-button" type="button" disabled>Submit guess</button>
           <div class="keyboard" id="keyboard"></div>
         </section>
-
         <p class="privacy-note" id="privacy-note"><span aria-hidden="true">✦</span> No account. No ads. Your history stays on this device.</p>
-
-      </main>
+      </div>
     </div>
 
     <div class="toast" id="toast" role="status" aria-live="assertive"></div>

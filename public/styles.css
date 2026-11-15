@@ -75,6 +75,8 @@ button:focus-visible, a:focus-visible, [role="button"]:focus-visible {
 .app-shell {
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
   width: min(100%, 35rem);
   height: var(--app-height);
   margin: 0 auto;
@@ -82,18 +84,23 @@ button:focus-visible, a:focus-visible, [role="button"]:focus-visible {
   overflow: hidden;
 }
 
+.top-screen { display: flex; min-height: 0; flex: 1 1 auto; flex-direction: column; }
+.bottom-screen { display: flex; flex: 0 0 auto; flex-direction: column; }
+
 .topbar {
   display: grid;
   grid-template-columns: 2.75rem 1fr 2.75rem;
   align-items: center;
   height: 3.5rem;
   min-height: 3.5rem;
+  flex: 0 0 auto;
   border-bottom: 1px solid var(--line);
 }
 
 main {
   display: flex;
-  height: calc(100% - 3.5rem);
+  height: auto;
+  flex: 1 1 auto;
   min-height: 0;
   flex-direction: column;
 }
@@ -325,7 +332,7 @@ main {
 
 .keyboard-wrap {
   flex: 0 0 auto;
-  margin-top: auto;
+  margin-top: 0;
   padding: 0.45rem 0 max(0.5rem, calc(env(safe-area-inset-bottom) - 1.1rem));
 }
 .submit-guess-button {
@@ -530,7 +537,7 @@ main {
     --key-height: clamp(2.2rem, 9.8vw, 2.5rem);
   }
   .topbar { height: 3rem; min-height: 3rem; }
-  main { height: calc(100% - 3rem); }
+  main { height: auto; }
   .day-heading { padding: 0.25rem 0; }
   .day-heading .eyebrow { display: none; }
   .day-heading h1 { font-size: 1rem; }
@@ -563,7 +570,7 @@ main {
   }
   .day-heading { display: none; }
   .topbar { height: 3rem; min-height: 3rem; }
-  main { height: calc(100% - 3rem); }
+  main { height: auto; }
   .game-switcher { margin: 0.15rem 0; }
   .game-pill { height: 1.7rem; min-width: 3.7rem; }
   .game-card { align-self: center; width: min(100%, 24rem); padding: 0.25rem 0.4rem 0.2rem; }
@@ -652,9 +659,53 @@ main {
     --key-height: clamp(1.25rem, min(6vw, calc((var(--app-height) - 14rem) / 5)), 1.7rem);
   }
   .topbar { height: 2.4rem; min-height: 2.4rem; }
-  main { height: calc(100% - 2.4rem); }
+  main { height: auto; }
   .game-pill { height: 1.45rem; min-width: 3.25rem; }
 }
+
+/* Enable the split only when script confirms folded posture and two stacked segments. */
+body.folded-stacked-mode .app-shell {
+  position: fixed;
+  top: env(viewport-segment-top 0 0, 0px);
+  left: env(viewport-segment-left 0 0, 0px);
+  display: grid;
+  width: env(viewport-segment-width 0 0, 100vw);
+  max-width: none;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  grid-template-rows: env(viewport-segment-height 0 0, 50dvh) env(viewport-segment-height 0 1, 50dvh);
+  row-gap: max(0px, calc(env(viewport-segment-top 0 1, 50dvh) - env(viewport-segment-bottom 0 0, 50dvh)));
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.folded-stacked-mode {
+  --board-gap: clamp(0.16rem, 0.8vw, 0.28rem);
+  --tile-size: clamp(1.35rem, min(11vw, calc((env(viewport-segment-height 0 0, 50dvh) - 15rem) / 6)), 2.8rem);
+  --key-height: clamp(2rem, min(10vw, calc((env(viewport-segment-height 0 1, 50dvh) - 10rem) / 12)), 3rem);
+  padding: 0;
+}
+
+body.folded-stacked-mode .top-screen {
+  grid-row: 1;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+  overflow: hidden;
+}
+
+body.folded-stacked-mode .top-screen main { height: auto; min-height: 0; flex: 1 1 auto; }
+body.folded-stacked-mode .bottom-screen {
+  grid-row: 2;
+  min-height: 0;
+  justify-content: center;
+  padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  overflow: hidden;
+}
+body.folded-stacked-mode .bottom-screen .keyboard-wrap { width: 100%; margin: auto 0; padding: 0.5rem 0; }
+body.folded-stacked-mode .bottom-screen .privacy-note { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }

@@ -97,6 +97,14 @@ export function findEmptyDraftSlot(draft, startIndex = 0) {
   return -1;
 }
 
+export function areVerticallyStackedSegments(segments) {
+  if (!Array.isArray(segments) || segments.length !== 2) return false;
+  const [top, bottom] = [...segments].sort((a, b) => a.top - b.top);
+  const horizontalOverlap = Math.min(top.right, bottom.right) - Math.max(top.left, bottom.left);
+  const sharedWidth = Math.min(top.width, bottom.width);
+  return bottom.top > top.top && top.bottom <= bottom.top + 1 && horizontalOverlap >= sharedWidth * 0.9;
+}
+
 export function emptyGameState() {
   return { guesses: [], draft: normalizeDraft([]), status: "playing", completedAt: null };
 }

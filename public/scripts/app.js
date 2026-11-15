@@ -3,6 +3,7 @@ import {
   GAMES_PER_DAY,
   MAX_GUESSES,
   WORD_LENGTH,
+  areVerticallyStackedSegments,
   buildKeyboardState,
   emptyGameState,
   findEmptyDraftSlot,
@@ -77,6 +78,34 @@ window.addEventListener("resize", syncViewportHeight);
 window.addEventListener("orientationchange", syncViewportHeight);
 window.visualViewport?.addEventListener("resize", syncViewportHeight);
 window.visualViewport?.addEventListener("scroll", syncViewportHeight);
+
+function hasVerticallyStackedSegments() {
+  try {
+    return areVerticallyStackedSegments(Array.from(window.viewport?.segments || []));
+  } catch {
+    return false;
+  }
+}
+
+function syncFoldLayout() {
+  let folded = false;
+  try {
+    folded = navigator.devicePosture?.type === "folded";
+  } catch {
+    folded = false;
+  }
+  document.body.classList.toggle("folded-stacked-mode", folded && hasVerticallyStackedSegments());
+}
+
+syncFoldLayout();
+try {
+  navigator.devicePosture?.addEventListener?.("change", syncFoldLayout);
+} catch {
+  // Unsupported or restricted posture APIs leave the standard layout untouched.
+}
+window.addEventListener("resize", syncFoldLayout);
+window.addEventListener("orientationchange", syncFoldLayout);
+window.visualViewport?.addEventListener("resize", syncFoldLayout);
 
 function loadState() {
   const fallback = { activeGame: 0, days: {} };
