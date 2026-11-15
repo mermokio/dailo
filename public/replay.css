@@ -36,7 +36,7 @@ h1 { margin: 0; font-size: clamp(1.75rem, 7vw, 2.5rem); line-height: 1.05; lette
 .replay-meta { margin: .7rem 0 1.5rem; color: var(--replay-muted); font-size: .9rem; }
 .replay-board { display: grid; gap: var(--replay-grid-gap); width: min(100%, 22rem); margin: 0 auto; }
 .replay-row { display: grid; grid-template-columns: repeat(5, var(--replay-tile-size)); justify-content: center; gap: var(--replay-grid-gap); }
-.replay-tile { display: grid; width: var(--replay-tile-size); height: var(--replay-tile-size); place-items: center; border: 1px solid var(--replay-line); border-radius: .65rem; color: white; font-size: clamp(.85rem, 5vw, 2rem); font-weight: 800; }
+.replay-tile { display: grid; width: var(--replay-tile-size); height: var(--replay-tile-size); place-items: center; border: 1px solid var(--replay-line); border-radius: .65rem; color: white; font-size: clamp(.75rem, 3.5dvh, 1.8rem); font-weight: 800; }
 .replay-tile.absent { border-color: var(--replay-gray); background: var(--replay-gray); }
 .replay-tile.present { border-color: var(--replay-yellow); background: var(--replay-yellow); }
 .replay-tile.correct { border-color: var(--replay-green); background: var(--replay-green); }
@@ -74,6 +74,18 @@ h1 { margin: 0; font-size: clamp(1.75rem, 7vw, 2.5rem); line-height: 1.05; lette
   .reveal-button { min-height: 2.2rem; }
   .back-link { margin-top: .3rem; font-size: .75rem; }
   .replay-version { padding-top: .4rem; font-size: .62rem; }
+}
+@media (orientation: landscape) and (max-height: 760px) {
+  :root { --replay-tile-size: clamp(1rem, min(5.5dvh, 3rem), 3rem); --replay-grid-gap: clamp(.2rem, .55dvh, .35rem); }
+  .replay-content { width: min(100%, 22rem); margin: auto; }
+  .replay-version { margin: 0; }
+  .replay-eyebrow { margin-bottom: .25rem; }
+  h1 { font-size: clamp(1.3rem, 3.6dvh, 1.8rem); }
+  .replay-meta { margin: .35rem 0 .8rem; }
+  .replay-tile { border-radius: min(.55rem, 1dvh); font-size: clamp(.65rem, 3dvh, 1.5rem); }
+  .replay-help { margin: .7rem 0 .4rem; }
+  .reveal-button { min-height: 2.8rem; }
+  .back-link { margin-top: .7rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
