@@ -52,8 +52,9 @@ test("replay layout scales its board and spacing to short viewports", async () =
   assert.match(css, /\.replay-version\s*\{\s*margin:\s*0;/);
   assert.match(css, /\.replay-meta\s*\{[^}]*white-space:\s*pre-line/);
   assert.match(css, /\.replay-meta\s*\{[^}]*text-align:\s*center/);
-  assert.match(css, /\.replay-board\s*\{[^}]*width:\s*min\(100%,\s*25rem\)/);
-  assert.match(css, /\.reveal-button\s*\{[^}]*width:\s*min\(100%,\s*20rem\)/);
+  assert.match(css, /--replay-row-width:\s*calc\(var\(--replay-tile-size\)[^;]+/);
+  assert.match(css, /\.replay-board\s*\{[^}]*width:\s*min\(100%,\s*var\(--replay-row-width\)\)/);
+  assert.match(css, /\.reveal-button\s*\{[^}]*width:\s*min\(100%,\s*var\(--replay-row-width\)\)/);
   assert.match(css, /\.reveal-button\s*\{[^}]*margin:\s*1rem auto 0/);
   assert.match(css, /@media\s*\(orientation:\s*landscape\)\s*and\s*\(max-height:\s*760px\)/);
   assert.match(css, /\.replay-content\s*\{\s*width:\s*min\(100%,\s*22rem\);\s*margin:\s*auto;/);
