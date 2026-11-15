@@ -30,7 +30,7 @@ body {
 .replay-brand { display: inline-flex; align-items: center; gap: .55rem; color: var(--replay-ink); font-size: 1.1rem; font-weight: 800; text-decoration: none; }
 .replay-brand img { width: 2.2rem; height: 2.2rem; border-radius: .7rem; }
 .replay-label { color: var(--replay-muted); font-size: .75rem; }
-.replay-content { width: min(100%, 26rem); margin: clamp(1rem, 4vh, 3rem) auto 0; text-align: center; }
+.replay-content { width: min(100%, 26rem); margin: auto; text-align: center; }
 .replay-eyebrow { margin: 0 0 .45rem; color: #a3e635; font-size: .67rem; font-weight: 800; letter-spacing: .13em; }
 h1 { margin: 0; font-size: clamp(1.75rem, 7vw, 2.5rem); line-height: 1.05; letter-spacing: -.05em; }
 .replay-meta { margin: .7rem 0 1.5rem; color: var(--replay-muted); font-size: .9rem; }
@@ -50,13 +50,13 @@ h1 { margin: 0; font-size: clamp(1.75rem, 7vw, 2.5rem); line-height: 1.05; lette
 .reveal-button:disabled { opacity: .75; cursor: default; }
 .replay-error { padding: 1rem; border: 1px solid rgba(255, 114, 94, .5); border-radius: .8rem; color: #ff9b8c; }
 .back-link { display: inline-block; margin-top: 1.3rem; color: var(--replay-muted); font-size: .85rem; }
-.replay-version { margin: auto 0 0; padding-top: 1.5rem; color: var(--replay-muted); font-size: .68rem; line-height: 1.2; text-align: center; opacity: .72; }
+.replay-version { margin: 0; padding-top: 1.5rem; color: var(--replay-muted); font-size: .68rem; line-height: 1.2; text-align: center; opacity: .72; }
 @media (max-height: 640px) {
   :root { --replay-tile-size: clamp(1.35rem, min(11vw, 6dvh), 2.5rem); --replay-grid-gap: .3rem; }
   .replay-shell { padding-top: max(.4rem, env(safe-area-inset-top)); padding-bottom: max(.4rem, env(safe-area-inset-bottom)); }
   .replay-header { padding-bottom: .45rem; }
   .replay-brand img { width: 1.8rem; height: 1.8rem; }
-  .replay-content { margin-top: .45rem; }
+  .replay-content { margin-block: auto; }
   .replay-eyebrow { margin-bottom: .2rem; }
   h1 { font-size: clamp(1.35rem, 5vw, 1.9rem); }
   .replay-meta { margin: .3rem 0 .6rem; }
@@ -68,7 +68,7 @@ h1 { margin: 0; font-size: clamp(1.75rem, 7vw, 2.5rem); line-height: 1.05; lette
 @media (max-height: 430px) {
   :root { --replay-tile-size: clamp(1rem, min(11vw, 5dvh), 1.8rem); --replay-grid-gap: .22rem; }
   .replay-eyebrow, .replay-help { display: none; }
-  .replay-content { margin-top: .25rem; }
+  .replay-content { margin-block: auto; }
   .replay-meta { margin: .2rem 0 .4rem; font-size: .75rem; }
   .replay-tile { border-radius: .35rem; font-size: clamp(.7rem, 3.5vw, 1rem); }
   .reveal-button { min-height: 2.2rem; }
