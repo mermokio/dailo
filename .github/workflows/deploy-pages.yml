@@ -31,7 +31,7 @@ jobs:
         env:
           APP_VERSION: 1.0.${{ github.run_number }}
         run: |
-          sed -i "s/__APP_VERSION__/${APP_VERSION}/g" public/index.html public/sw.js
+          sed -i "s/__APP_VERSION__/${APP_VERSION}/g" public/index.html public/replay.html public/sw.js
 
       - name: Upload static site
         uses: actions/upload-pages-artifact@v3
