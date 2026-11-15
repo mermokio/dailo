@@ -51,6 +51,7 @@ test("replay layout scales its board and spacing to short viewports", async () =
   assert.match(css, /\.replay-content\s*\{\s*width:\s*min\(100%,\s*30rem\);\s*margin:\s*auto;/);
   assert.match(css, /\.replay-version\s*\{\s*margin:\s*0;/);
   assert.match(css, /\.replay-meta\s*\{[^}]*white-space:\s*pre-line/);
+  assert.match(css, /\.replay-meta\s*\{[^}]*text-align:\s*center/);
   assert.match(css, /@media\s*\(orientation:\s*landscape\)\s*and\s*\(max-height:\s*760px\)/);
   assert.match(css, /\.replay-content\s*\{\s*width:\s*min\(100%,\s*22rem\);\s*margin:\s*auto;/);
   assert.match(css, /\.replay-tile\s*\{[^}]*font-size:\s*clamp\([^;]*dvh/);
@@ -93,6 +94,9 @@ test("share image sends only a file and emoji share links to a reveal replay", a
   assert.match(app, /url\.searchParams\.set\("r", token\)/);
   assert.match(app, /\$\{replayLink\}/);
   assert.match(replayHtml, /id="reveal-button"[^>]*>Reveal guessed letters/);
+  assert.doesNotMatch(replayHtml, /Tap below when you're ready to reveal the guessed letters/);
+  assert.doesNotMatch(replayHtml, /replay-help/);
+  assert.doesNotMatch(replayHtml, /Play Dailo/);
   assert.match(replayHtml, /<script defer src="\.\/scripts\/replay\.js"><\/script>/);
   assert.match(replayScript, /search\.get\("r"\) \|\| fragment\.get\("r"\)/);
   assert.match(replayScript, /tile\.textContent = replay\.guesses\[row\]\[column\]\.toUpperCase\(\)/);
@@ -127,7 +131,7 @@ test("shared replay link paints colored guesses before reveal and reveals on tap
       return this.children.flatMap((row) => row.children).filter((tile) => tile.dataset.row !== undefined);
     }
   }
-  const elements = Object.fromEntries(["replay-root", "replay-board", "replay-meta", "replay-help", "reveal-button", "replay-error"].map((id) => [id, new Element()]));
+  const elements = Object.fromEntries(["replay-root", "replay-board", "replay-meta", "reveal-button", "replay-error"].map((id) => [id, new Element()]));
   const scheduled = [];
   let clock = 0;
   vm.runInNewContext(source, {

@@ -4,7 +4,6 @@
   const root = document.querySelector("#replay-root");
   const board = document.querySelector("#replay-board");
   const meta = document.querySelector("#replay-meta");
-  const help = document.querySelector("#replay-help");
   const revealButton = document.querySelector("#reveal-button");
   const error = document.querySelector("#replay-error");
   const colors = { 0: "absent", 1: "present", 2: "correct" };
@@ -36,7 +35,6 @@
   if (!replay) {
     board.hidden = true;
     meta.hidden = true;
-    help.hidden = true;
     revealButton.hidden = true;
     error.hidden = false;
     return;
@@ -73,7 +71,6 @@
       const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
       revealButton.disabled = true;
       revealButton.textContent = "Revealing…";
-      help.textContent = "Watch each guess come back to life.";
       tiles.forEach((tile) => {
         tile.classList.remove("absent", "present", "correct", "is-flipping");
         tile.classList.add("is-waiting");
@@ -94,7 +91,6 @@
       if (reduceMotion) {
         tiles.forEach((tile) => revealTile(tile, Number(tile.dataset.row), Number(tile.dataset.column), false));
         revealButton.textContent = "Letters revealed";
-        help.textContent = "Here are the letters from each guess.";
         return;
       }
 
@@ -115,14 +111,12 @@
       const finishAfter = CLEAR_DURATION + (replay.guesses.length - 1) * ROW_INTERVAL + (WORD_LENGTH - 1) * TILE_STAGGER + FLIP_DURATION;
       setTimeout(() => {
         revealButton.textContent = "Letters revealed";
-        help.textContent = "Here are the letters from each guess.";
       }, finishAfter);
     }, { once: true });
   } catch {
     root.dataset.replayError = "render";
     board.hidden = true;
     meta.hidden = true;
-    help.hidden = true;
     revealButton.hidden = true;
     error.hidden = false;
   }
