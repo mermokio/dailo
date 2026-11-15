@@ -48,8 +48,9 @@ test("replay layout scales its board and spacing to short viewports", async () =
   assert.match(css, /grid-template-columns:\s*repeat\(5, var\(--replay-tile-size\)\)/);
   assert.match(css, /@media\s*\(max-height:\s*640px\)/);
   assert.match(css, /@media\s*\(max-height:\s*430px\)/);
-  assert.match(css, /\.replay-content\s*\{\s*width:\s*min\(100%,\s*26rem\);\s*margin:\s*auto;/);
+  assert.match(css, /\.replay-content\s*\{\s*width:\s*min\(100%,\s*30rem\);\s*margin:\s*auto;/);
   assert.match(css, /\.replay-version\s*\{\s*margin:\s*0;/);
+  assert.match(css, /\.replay-meta\s*\{[^}]*white-space:\s*pre-line/);
   assert.match(css, /@media\s*\(orientation:\s*landscape\)\s*and\s*\(max-height:\s*760px\)/);
   assert.match(css, /\.replay-content\s*\{\s*width:\s*min\(100%,\s*22rem\);\s*margin:\s*auto;/);
   assert.match(css, /\.replay-tile\s*\{[^}]*font-size:\s*clamp\([^;]*dvh/);
@@ -144,6 +145,7 @@ test("shared replay link paints colored guesses before reveal and reveals on tap
   });
 
   const board = elements["replay-board"];
+  assert.match(elements["replay-meta"].textContent, /November 15, 2026\nGame 1 of 3 · 3\/6 guesses/);
   const tiles = board.children.flatMap((row) => row.children);
   assert.equal(board.children.length, 6);
   assert.equal(tiles.length, 30);

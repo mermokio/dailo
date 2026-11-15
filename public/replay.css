@@ -8,7 +8,7 @@
   --replay-green: #5f9513;
   --replay-yellow: #9a7610;
   --replay-gray: #3b4658;
-  --replay-tile-size: clamp(1.6rem, min(12vw, 7dvh), 3.5rem);
+  --replay-tile-size: clamp(1.6rem, min(13vw, 7.5dvh), 3.8rem);
   --replay-grid-gap: .4rem;
   font-family: "Avenir Next", "Segoe UI", system-ui, sans-serif;
   color: var(--replay-ink);
@@ -30,10 +30,10 @@ body {
 .replay-brand { display: inline-flex; align-items: center; gap: .55rem; color: var(--replay-ink); font-size: 1.1rem; font-weight: 800; text-decoration: none; }
 .replay-brand img { width: 2.2rem; height: 2.2rem; border-radius: .7rem; }
 .replay-label { color: var(--replay-muted); font-size: .75rem; }
-.replay-content { width: min(100%, 26rem); margin: auto; text-align: center; }
+.replay-content { width: min(100%, 30rem); margin: auto; text-align: center; }
 .replay-eyebrow { margin: 0 0 .45rem; color: #a3e635; font-size: .67rem; font-weight: 800; letter-spacing: .13em; }
 h1 { margin: 0; font-size: clamp(1.75rem, 7vw, 2.5rem); line-height: 1.05; letter-spacing: -.05em; }
-.replay-meta { margin: .7rem 0 1.5rem; color: var(--replay-muted); font-size: .9rem; }
+.replay-meta { width: max-content; max-width: 100%; margin: .7rem auto 1.5rem; color: var(--replay-muted); font-size: .9rem; line-height: 1.35; white-space: pre-line; }
 .replay-board { display: grid; gap: var(--replay-grid-gap); width: min(100%, 22rem); margin: 0 auto; }
 .replay-row { display: grid; grid-template-columns: repeat(5, var(--replay-tile-size)); justify-content: center; gap: var(--replay-grid-gap); }
 .replay-tile { display: grid; width: var(--replay-tile-size); height: var(--replay-tile-size); place-items: center; border: 1px solid var(--replay-line); border-radius: .65rem; color: white; font-size: clamp(.75rem, 3.5dvh, 1.8rem); font-weight: 800; }

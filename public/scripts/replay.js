@@ -44,7 +44,8 @@
 
   try {
     const date = new Date(`${replay.date}T12:00:00`);
-    meta.textContent = `${new Intl.DateTimeFormat(undefined, { dateStyle: "long" }).format(date)} · Game ${replay.gameIndex + 1} of 3 · ${replay.guesses.length}/${MAX_GUESSES} guesses`;
+    const dateLabel = new Intl.DateTimeFormat(undefined, { dateStyle: "long" }).format(date);
+    meta.textContent = `${dateLabel}\nGame ${replay.gameIndex + 1} of 3 · ${replay.guesses.length}/${MAX_GUESSES} guesses`;
 
     for (let rowIndex = 0; rowIndex < MAX_GUESSES; rowIndex += 1) {
       const row = document.createElement("div");
