@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#111827" />
+    <title>Dailo fold check</title>
+    <style>
+      :root { color-scheme: dark; font: 16px/1.5 system-ui, sans-serif; background: #111827; color: #f8fafc; }
+      body { max-width: 42rem; margin: 0 auto; padding: 1.5rem; }
+      h1 { margin-bottom: 0.25rem; font-size: 1.5rem; }
+      p { color: #b9c3d1; }
+      a { color: #bef264; }
+      pre { overflow: auto; padding: 1rem; border: 1px solid #3b4658; border-radius: 0.8rem; background: #172033; color: #d9f99d; white-space: pre-wrap; }
+      .hint { font-size: 0.9rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Dailo fold check</h1>
+    <p class="hint">Keep this page open and fold/unfold the device. These live readings show whether Safari is exposing the stacked-screen signals Dailo needs.</p>
+    <pre id="status" aria-live="polite">Checking Safari…</pre>
+    <p><a href="./">Back to Dailo</a></p>
+    <script>
+      const postureQuery = window.matchMedia("(device-posture: folded)");
+      const stackedQuery = window.matchMedia("(vertical-viewport-segments: 2)");
+
+      function readSegments() {
+        try {
+          return Array.from(window.viewport?.segments || []).map(({ left, top, right, bottom, width, height }) => ({
+            left, top, right, bottom, width, height
+          }));
+        } catch {
+          return [];
+        }
+      }
+
+      function isStacked(segments) {
+        if (segments.length !== 2) return false;
+        const [top, bottom] = [...segments].sort((a, b) => a.top - b.top);
+        const overlap = Math.min(top.right, bottom.right) - Math.max(top.left, bottom.left);
+        return bottom.top > top.top && overlap >= Math.min(top.width, bottom.width) * 0.9;
+      }
+
+      function refresh() {
+        const segments = readSegments();
+        document.querySelector("#status").textContent = JSON.stringify({
+          postureApi: navigator.devicePosture ? "available" : "not exposed",
+          posture: navigator.devicePosture?.type || "unknown",
+          foldedMediaQuery: postureQuery.matches,
+          viewportSegmentsApi: window.viewport?.segments ? "available" : "not exposed",
+          segmentCount: segments.length,
+          verticalSegmentsMediaQuery: stackedQuery.matches,
+          stackedSegmentGeometry: isStacked(segments),
+          segments
+        }, null, 2);
+      }
+
+      refresh();
+      window.addEventListener("resize", refresh);
+      window.addEventListener("orientationchange", refresh);
+      window.visualViewport?.addEventListener("resize", refresh);
+      stackedQuery.addEventListener?.("change", refresh);
+      postureQuery.addEventListener?.("change", refresh);
+      try { navigator.devicePosture?.addEventListener?.("change", refresh); } catch { /* Optional preview API. */ }
+      window.setInterval(refresh, 500);
+    </script>
+  </body>
+</html>

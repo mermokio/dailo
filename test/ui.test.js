@@ -52,6 +52,14 @@ test("top-bottom fold layout is gated by stacked viewport segments", async () =>
   assert.match(css, /body\.folded-stacked-mode \.bottom-screen/);
 });
 
+test("fold diagnostics reports the Safari posture and segment signals", async () => {
+  const diagnostic = await readFile(new URL("../public/fold-diagnostics.html", import.meta.url), "utf8");
+  assert.match(diagnostic, /vertical-viewport-segments: 2/);
+  assert.match(diagnostic, /navigator\.devicePosture/);
+  assert.match(diagnostic, /window\.viewport\?\.segments/);
+  assert.match(diagnostic, /stackedSegmentGeometry/);
+});
+
 test("submit is hidden only when the selected game is finished", async () => {
   const app = await readFile(new URL("../public/scripts/app.js", import.meta.url), "utf8");
   assert.match(app, /els\.submitButton\.hidden = game\.status !== "playing"/);
