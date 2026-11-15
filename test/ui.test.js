@@ -60,6 +60,24 @@ test("fold diagnostics reports the Safari posture and segment signals", async ()
   assert.match(diagnostic, /stackedSegmentGeometry/);
 });
 
+test("share image sends only a file and emoji share links to a reveal replay", async () => {
+  const [app, replayHtml, replayScript, serviceWorker] = await Promise.all([
+    readFile(new URL("../public/scripts/app.js", import.meta.url), "utf8"),
+    readFile(new URL("../public/replay.html", import.meta.url), "utf8"),
+    readFile(new URL("../public/scripts/replay.js", import.meta.url), "utf8"),
+    readFile(new URL("../public/sw.js", import.meta.url), "utf8")
+  ]);
+  assert.match(app, /navigator\.share\(\{ files: \[file\] \}\)/);
+  assert.doesNotMatch(app, /navigator\.share\(\{ title: "My Dailo", text: shareText\(\), files:/);
+  assert.match(app, /new URL\("\.\/replay\.html", window\.location\.href\)/);
+  assert.match(app, /\$\{replayLink\}/);
+  assert.match(replayHtml, /id="reveal-button"[^>]*>Reveal guessed letters/);
+  assert.match(replayScript, /decodeReplayToken/);
+  assert.match(replayScript, /tile\.textContent = letter/);
+  assert.match(serviceWorker, /"\.\/replay\.html"/);
+  assert.match(serviceWorker, /"\.\/scripts\/replay\.js"/);
+});
+
 test("submit is hidden only when the selected game is finished", async () => {
   const app = await readFile(new URL("../public/scripts/app.js", import.meta.url), "utf8");
   assert.match(app, /els\.submitButton\.hidden = game\.status !== "playing"/);

@@ -81,6 +81,36 @@ export function resultEmojiRows(guesses, answer) {
   return guesses.map((guess) => scoreGuess(guess, answer).map((state) => emoji[state]).join(""));
 }
 
+const RESULT_CODES = { absent: "0", present: "1", correct: "2" };
+
+export function encodeReplayToken(dateKey, gameIndex, guesses, answer) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey) || !Number.isInteger(gameIndex) || gameIndex < 0 || gameIndex >= GAMES_PER_DAY) {
+    throw new Error("Invalid replay details");
+  }
+  const normalizedGuesses = guesses.map((guess) => String(guess).toLowerCase());
+  if (!normalizedGuesses.length || normalizedGuesses.length > MAX_GUESSES || normalizedGuesses.some((guess) => !/^[a-z]{5}$/.test(guess))) {
+    throw new Error("Invalid replay guesses");
+  }
+  const results = normalizedGuesses.map((guess) => scoreGuess(guess, answer).map((status) => RESULT_CODES[status]).join(""));
+  const payload = { v: 1, d: dateKey, g: gameIndex, l: normalizedGuesses, r: results };
+  return btoa(JSON.stringify(payload)).replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
+}
+
+export function decodeReplayToken(token) {
+  try {
+    if (typeof token !== "string" || !token || token.length > 512 || !/^[A-Za-z0-9_-]+$/.test(token)) return null;
+    const base64 = token.replaceAll("-", "+").replaceAll("_", "/");
+    const padded = base64 + "=".repeat((4 - base64.length % 4) % 4);
+    const payload = JSON.parse(atob(padded));
+    if (payload?.v !== 1 || !/^\d{4}-\d{2}-\d{2}$/.test(payload.d) || !Number.isInteger(payload.g) || payload.g < 0 || payload.g >= GAMES_PER_DAY) return null;
+    if (!Array.isArray(payload.l) || !payload.l.length || payload.l.length > MAX_GUESSES || payload.l.some((guess) => typeof guess !== "string" || !/^[a-z]{5}$/.test(guess))) return null;
+    if (!Array.isArray(payload.r) || payload.r.length !== payload.l.length || payload.r.some((row) => typeof row !== "string" || !/^[012]{5}$/.test(row))) return null;
+    return { date: payload.d, gameIndex: payload.g, guesses: payload.l, results: payload.r };
+  } catch {
+    return null;
+  }
+}
+
 export function normalizeDraft(draft) {
   const source = Array.isArray(draft) ? draft : typeof draft === "string" ? [...draft] : [];
   return Array.from({ length: WORD_LENGTH }, (_, index) => {

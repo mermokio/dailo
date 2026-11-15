@@ -2,10 +2,13 @@ const CACHE_NAME = "dailo-v__APP_VERSION__";
 const APP_SHELL = [
   "./",
   "./index.html",
+  "./replay.html",
   "./styles.css",
+  "./replay.css",
   "./manifest.webmanifest",
   "./scripts/app.js",
   "./scripts/game.js",
+  "./scripts/replay.js",
   "./assets/words.js",
   "./assets/icon-lighthouse-180.png",
   "./assets/icon-lighthouse-192.png",

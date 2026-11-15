@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#111827" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="description" content="Replay a shared Dailo word game." />
+    <link rel="icon" href="./assets/icon-lighthouse-192.png" type="image/png" sizes="192x192" />
+    <link rel="stylesheet" href="./replay.css" />
+    <title>Dailo replay</title>
+  </head>
+  <body>
+    <main class="replay-shell" id="replay-root">
+      <header class="replay-header">
+        <a href="./" class="replay-brand" aria-label="Dailo home">
+          <img src="./assets/icon-lighthouse-192.png" alt="" />
+          <span>Dailo</span>
+        </a>
+        <span class="replay-label">Shared replay</span>
+      </header>
+      <section class="replay-content" aria-labelledby="replay-title">
+        <p class="replay-eyebrow">THE COLORS TELL THE STORY</p>
+        <h1 id="replay-title">A daily word, replayed.</h1>
+        <p class="replay-meta" id="replay-meta"></p>
+        <div class="replay-board" id="replay-board" aria-label="Color-coded guesses"></div>
+        <p class="replay-help" id="replay-help">Tap below when you're ready to reveal the guessed letters.</p>
+        <button class="reveal-button" id="reveal-button" type="button">Reveal guessed letters</button>
+        <p class="replay-error" id="replay-error" hidden>This replay link is invalid or incomplete.</p>
+        <a class="back-link" href="./">Play Dailo</a>
+      </section>
+    </main>
+    <script type="module" src="./scripts/replay.js"></script>
+  </body>
+</html>

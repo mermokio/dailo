@@ -3,7 +3,9 @@ import assert from "node:assert/strict";
 import {
   areVerticallyStackedSegments,
   buildKeyboardState,
+  decodeReplayToken,
   emptyGameState,
+  encodeReplayToken,
   findEmptyDraftSlot,
   getDailyAnswers,
   hashString,
@@ -44,6 +46,19 @@ test("keyboard keeps the strongest known state", () => {
 
 test("emoji output reflects scored guesses", () => {
   assert.deepEqual(resultEmojiRows(["cider"], "cider"), ["🟩🟩🟩🟩🟩"]);
+});
+
+test("replay tokens hide plain guesses while preserving the colored board", () => {
+  const token = encodeReplayToken("2026-11-15", 1, ["allee"], "apple");
+  assert.match(token, /^[A-Za-z0-9_-]+$/);
+  assert.doesNotMatch(token, /allee|2026-11-15/);
+  assert.deepEqual(decodeReplayToken(token), {
+    date: "2026-11-15",
+    gameIndex: 1,
+    guesses: ["allee"],
+    results: ["21002"]
+  });
+  assert.equal(decodeReplayToken("not-a-valid-token"), null);
 });
 
 test("draft slots support arbitrary-order entry and legacy drafts", () => {

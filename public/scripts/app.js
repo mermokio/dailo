@@ -6,6 +6,7 @@ import {
   areVerticallyStackedSegments,
   buildKeyboardState,
   emptyGameState,
+  encodeReplayToken,
   findEmptyDraftSlot,
   getDailyAnswers,
   localDateKey,
@@ -415,11 +416,18 @@ function hasWin(dateKey) {
   return state.days[dateKey]?.games?.some((game) => game.status === "won") || false;
 }
 
-function shareText() {
+function replayUrl() {
+  const token = encodeReplayToken(today, activeGame, currentGame().guesses, dailyAnswers[activeGame]);
+  const url = new URL("./replay.html", window.location.href);
+  url.hash = new URLSearchParams({ r: token }).toString();
+  return url.href;
+}
+
+function shareText(replayLink) {
   const game = currentGame();
   const rows = resultEmojiRows(game.guesses, dailyAnswers[activeGame]);
   const score = game.status === "won" ? game.guesses.length : "X";
-  return `Dailo ${today} · ${activeGame + 1}/3 · ${score}/${MAX_GUESSES}\n\n${rows.join("\n")}\n\nPlay today's trio`;
+  return `Dailo ${today} · ${activeGame + 1}/3 · ${score}/${MAX_GUESSES}\n\n${rows.join("\n")}\n\n${replayLink}`;
 }
 
 async function drawShareCard() {
@@ -533,7 +541,7 @@ async function shareImage() {
   const file = new File([blob], `dailo-${today}-${activeGame + 1}.png`, { type: "image/png" });
   if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
     try {
-      await navigator.share({ title: "My Dailo", text: shareText(), files: [file] });
+      await navigator.share({ files: [file] });
       return;
     } catch (error) {
       if (error.name === "AbortError") return;
@@ -548,7 +556,7 @@ async function shareEmojiResult() {
     return;
   }
   try {
-    await navigator.share({ title: "My Dailo", text: shareText() });
+    await navigator.share({ title: "My Dailo", text: shareText(replayUrl()) });
   } catch (error) {
     if (error.name !== "AbortError") toast("Couldn't open the share sheet. Please try again.");
   }
