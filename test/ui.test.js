@@ -45,8 +45,10 @@ test("game viewport uses height-aware, scroll-free sizing", async () => {
 test("replay layout scales its board and spacing to short viewports", async () => {
   const css = await readFile(new URL("../public/replay.css", import.meta.url), "utf8");
   assert.match(css, /--replay-tile-size:\s*clamp\([^;]*dvh/);
+  assert.match(css, /--replay-tile-size:\s*clamp\(1\.6rem,\s*min\(17\.5vw,\s*10dvh\),\s*4\.7rem\)/);
   assert.match(css, /grid-template-columns:\s*repeat\(5, var\(--replay-tile-size\)\)/);
   assert.match(css, /@media\s*\(max-height:\s*640px\)/);
+  assert.match(css, /--replay-tile-size:\s*clamp\(1\.5rem,\s*min\(15vw,\s*8dvh\),\s*3rem\)/);
   assert.match(css, /@media\s*\(max-height:\s*430px\)/);
   assert.match(css, /\.replay-content\s*\{\s*width:\s*min\(100%,\s*30rem\);\s*margin:\s*auto;/);
   assert.match(css, /\.replay-version\s*\{\s*margin:\s*0;/);
