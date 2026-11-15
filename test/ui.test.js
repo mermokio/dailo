@@ -42,6 +42,15 @@ test("game viewport uses height-aware, scroll-free sizing", async () => {
   assert.match(css, /safe-area-inset-bottom/);
 });
 
+test("replay layout scales its board and spacing to short viewports", async () => {
+  const css = await readFile(new URL("../public/replay.css", import.meta.url), "utf8");
+  assert.match(css, /--replay-tile-size:\s*clamp\([^;]*dvh/);
+  assert.match(css, /grid-template-columns:\s*repeat\(5, var\(--replay-tile-size\)\)/);
+  assert.match(css, /@media\s*\(max-height:\s*640px\)/);
+  assert.match(css, /@media\s*\(max-height:\s*430px\)/);
+  assert.match(css, /\.replay-version\s*\{[\s\S]*?padding-top/);
+});
+
 test("top-bottom fold layout is gated by stacked viewport segments", async () => {
   const [html, app, css] = await Promise.all([
     readFile(new URL("../public/index.html", import.meta.url), "utf8"),
