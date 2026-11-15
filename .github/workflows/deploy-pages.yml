@@ -27,6 +27,12 @@ jobs:
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
+      - name: Set deployment version
+        env:
+          APP_VERSION: 1.0.${{ github.run_number }}
+        run: |
+          sed -i "s/__APP_VERSION__/${APP_VERSION}/g" public/index.html public/sw.js
+
       - name: Upload static site
         uses: actions/upload-pages-artifact@v3
         with:

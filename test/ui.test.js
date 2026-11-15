@@ -13,6 +13,21 @@ test("install promotion is completely removed", async () => {
   assert.doesNotMatch(css, /\.install-banner/);
 });
 
+test("footer displays an automatically generated deployment version", async () => {
+  const [html, css, workflow, serviceWorker] = await Promise.all([
+    readFile(new URL("../public/index.html", import.meta.url), "utf8"),
+    readFile(new URL("../public/styles.css", import.meta.url), "utf8"),
+    readFile(new URL("../.github/workflows/deploy-pages.yml", import.meta.url), "utf8"),
+    readFile(new URL("../public/sw.js", import.meta.url), "utf8")
+  ]);
+  assert.match(html, /class="app-version"[^>]*>v__APP_VERSION__/);
+  assert.doesNotMatch(html, /No account\. No ads\./);
+  assert.match(css, /\.app-version\s*\{[\s\S]*?display:\s*block/);
+  assert.match(workflow, /APP_VERSION:\s*1\.0\.\$\{\{ github\.run_number \}\}/);
+  assert.match(workflow, /sed -i[\s\S]*public\/index\.html public\/sw\.js/);
+  assert.match(serviceWorker, /dailo-v__APP_VERSION__/);
+});
+
 test("game viewport uses height-aware, scroll-free sizing", async () => {
   const css = await readFile(new URL("../public/styles.css", import.meta.url), "utf8");
   assert.match(css, /height:\s*100dvh/);
