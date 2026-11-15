@@ -76,7 +76,8 @@ test("share image sends only a file and emoji share links to a reveal replay", a
   assert.match(replayHtml, /id="reveal-button"[^>]*>Reveal guessed letters/);
   assert.match(replayHtml, /<script defer src="\.\/scripts\/replay\.js"><\/script>/);
   assert.match(replayScript, /search\.get\("r"\) \|\| fragment\.get\("r"\)/);
-  assert.match(replayScript, /tile\.textContent = letter/);
+  assert.match(replayScript, /tile\.textContent = replay\.guesses\[row\]\[column\]\.toUpperCase\(\)/);
+  assert.match(replayScript, /prefers-reduced-motion: reduce/);
   assert.doesNotMatch(replayScript, /^import\s/m);
   assert.match(serviceWorker, /"\.\/replay\.html"/);
   assert.match(serviceWorker, /"\.\/scripts\/replay\.js"/);
@@ -91,7 +92,11 @@ test("shared replay link paints colored guesses before reveal and reveals on tap
       this.dataset = {};
       this.attributes = {};
       this.classes = new Set();
-      this.classList = { add: (name) => this.classes.add(name), contains: (name) => this.classes.has(name) };
+      this.classList = {
+        add: (...names) => names.forEach((name) => this.classes.add(name)),
+        remove: (...names) => names.forEach((name) => this.classes.delete(name)),
+        contains: (name) => this.classes.has(name)
+      };
       this.hidden = false;
       this.textContent = "";
     }
@@ -104,11 +109,15 @@ test("shared replay link paints colored guesses before reveal and reveals on tap
     }
   }
   const elements = Object.fromEntries(["replay-root", "replay-board", "replay-meta", "replay-help", "reveal-button", "replay-error"].map((id) => [id, new Element()]));
+  const scheduled = [];
+  let clock = 0;
   vm.runInNewContext(source, {
     URLSearchParams,
     atob,
     Date,
     Intl,
+    setTimeout: (callback, delay = 0) => scheduled.push({ callback, due: clock + delay }),
+    window: { matchMedia: () => ({ matches: false }) },
     location: { search: "", hash: `#r=${token}` },
     document: {
       querySelector: (selector) => elements[selector.slice(1)],
@@ -125,10 +134,23 @@ test("shared replay link paints colored guesses before reveal and reveals on tap
   assert.ok(tiles.every((tile) => tile.textContent === ""));
 
   elements["reveal-button"].listeners.click();
+  assert.ok(tiles.every((tile) => tile.textContent === ""));
+  assert.equal(elements["replay-board"].classList.contains("is-clearing"), true);
+  const runNextTimer = () => {
+    scheduled.sort((a, b) => a.due - b.due);
+    const next = scheduled.shift();
+    clock = next.due;
+    next.callback();
+  };
+  runNextTimer(); // Clear the old color-only board.
+  runNextTimer(); // Flip in the first letter of guess one.
   assert.equal(tiles[0].textContent, "H");
+  assert.equal(tiles[5].textContent, "");
+  while (scheduled.length) runNextTimer();
   assert.equal(tiles[5].textContent, "D");
   assert.equal(tiles[10].textContent, "D");
   assert.equal(elements["reveal-button"].disabled, true);
+  assert.equal(elements["reveal-button"].textContent, "Letters revealed");
 });
 
 test("submit is hidden only when the selected game is finished", async () => {

@@ -8,6 +8,10 @@
   const revealButton = document.querySelector("#reveal-button");
   const error = document.querySelector("#replay-error");
   const colors = { 0: "absent", 1: "present", 2: "correct" };
+  const CLEAR_DURATION = 260;
+  const TILE_STAGGER = 68;
+  const ROW_INTERVAL = 820;
+  const FLIP_DURATION = 480;
 
   function decodeToken(token) {
     try {
@@ -64,16 +68,54 @@
     }
 
     revealButton.addEventListener("click", () => {
-      board.querySelectorAll(".replay-tile[data-row]").forEach((tile) => {
-        const row = Number(tile.dataset.row);
-        const column = Number(tile.dataset.column);
-        const letter = replay.guesses[row][column].toUpperCase();
-        tile.textContent = letter;
-        tile.setAttribute("aria-label", `${letter}, ${colors[replay.results[row][column]]}`);
-      });
-      revealButton.textContent = "Letters revealed";
+      const tiles = [...board.querySelectorAll(".replay-tile[data-row]")];
+      const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
       revealButton.disabled = true;
-      help.textContent = "Here are the letters from each guess.";
+      revealButton.textContent = "Revealing…";
+      help.textContent = "Watch each guess come back to life.";
+      tiles.forEach((tile) => {
+        tile.classList.remove("absent", "present", "correct", "is-flipping");
+        tile.classList.add("is-waiting");
+        tile.textContent = "";
+        tile.setAttribute("aria-label", `Guess ${Number(tile.dataset.row) + 1}, letter ${Number(tile.dataset.column) + 1}, hidden`);
+      });
+
+      const revealTile = (tile, row, column, animate) => {
+        const color = colors[replay.results[row][column]];
+        tile.classList.remove("is-waiting");
+        tile.classList.add(color);
+        if (animate) tile.classList.add("is-flipping");
+        tile.textContent = replay.guesses[row][column].toUpperCase();
+        tile.setAttribute("aria-label", `${replay.guesses[row][column].toUpperCase()}, ${color}`);
+        if (animate) setTimeout(() => tile.classList.remove("is-flipping"), FLIP_DURATION);
+      };
+
+      if (reduceMotion) {
+        tiles.forEach((tile) => revealTile(tile, Number(tile.dataset.row), Number(tile.dataset.column), false));
+        revealButton.textContent = "Letters revealed";
+        help.textContent = "Here are the letters from each guess.";
+        return;
+      }
+
+      board.classList.add("is-clearing");
+      setTimeout(() => {
+        board.classList.remove("is-clearing");
+        const showWord = (rowIndex) => {
+          const wordTiles = tiles.filter((tile) => Number(tile.dataset.row) === rowIndex);
+          wordTiles.forEach((tile) => {
+            const column = Number(tile.dataset.column);
+            setTimeout(() => revealTile(tile, rowIndex, column, true), column * TILE_STAGGER);
+          });
+          if (rowIndex + 1 < replay.guesses.length) setTimeout(() => showWord(rowIndex + 1), ROW_INTERVAL);
+        };
+        showWord(0);
+      }, CLEAR_DURATION);
+
+      const finishAfter = CLEAR_DURATION + (replay.guesses.length - 1) * ROW_INTERVAL + (WORD_LENGTH - 1) * TILE_STAGGER + FLIP_DURATION;
+      setTimeout(() => {
+        revealButton.textContent = "Letters revealed";
+        help.textContent = "Here are the letters from each guess.";
+      }, finishAfter);
     }, { once: true });
   } catch {
     root.dataset.replayError = "render";

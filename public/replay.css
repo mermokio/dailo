@@ -38,11 +38,19 @@ h1 { margin: 0; font-size: clamp(1.75rem, 7vw, 2.5rem); line-height: 1.05; lette
 .replay-tile.absent { border-color: var(--replay-gray); background: var(--replay-gray); }
 .replay-tile.present { border-color: var(--replay-yellow); background: var(--replay-yellow); }
 .replay-tile.correct { border-color: var(--replay-green); background: var(--replay-green); }
+.replay-tile.is-waiting { border-color: var(--replay-line); background: transparent; color: transparent; }
+.replay-board.is-clearing .replay-tile { animation: tile-clear .24s ease-in both; }
+.replay-tile.is-flipping { animation: tile-flip .48s cubic-bezier(.2,.75,.25,1) both; transform-style: preserve-3d; }
+@keyframes tile-clear { to { opacity: .25; transform: rotateX(90deg) scale(.82); } }
+@keyframes tile-flip { 0% { opacity: .35; transform: rotateX(90deg) scale(.86); } 58% { transform: rotateX(-10deg) scale(1.04); } 100% { opacity: 1; transform: rotateX(0) scale(1); } }
 .replay-help { margin: 1.2rem 0 .65rem; color: var(--replay-muted); font-size: .85rem; }
 .reveal-button { width: 100%; min-height: 3.2rem; border: 0; border-radius: .85rem; background: #a3e635; color: #111827; font: inherit; font-weight: 800; cursor: pointer; }
 .reveal-button:disabled { opacity: .75; cursor: default; }
 .replay-error { padding: 1rem; border: 1px solid rgba(255, 114, 94, .5); border-radius: .8rem; color: #ff9b8c; }
 .back-link { display: inline-block; margin-top: 1.3rem; color: var(--replay-muted); font-size: .85rem; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+}
 @media (prefers-color-scheme: light) {
   :root { --replay-bg: #f4f7f2; --replay-panel: white; --replay-ink: #233128; --replay-muted: #68766c; --replay-line: rgba(35, 49, 40, .13); --replay-green: #6a9c25; --replay-yellow: #c09a20; --replay-gray: #687180; }
   body { background: radial-gradient(circle at 50% 0, rgba(163, 230, 53, .16), transparent 26rem), var(--replay-bg); }
