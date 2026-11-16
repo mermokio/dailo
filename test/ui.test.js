@@ -199,8 +199,20 @@ test("V2 reserves space between its board and keyboard and hides the keyboard on
   assert.match(app, /keyboardWrap\.hidden = game\.status !== "playing"/);
   assert.match(css, /\.keyboard-wrap\[hidden\]\s*\{\s*display:\s*none !important/);
   assert.match(css, /\.game-card\s*\{[^}]*display:\s*flex/);
-  assert.match(css, /\.board\s*\{[^}]*max-height:\s*calc\(100% - 2\.75rem\)/);
-  assert.match(css, /\.board\s*\{[^}]*width:\s*min\(100%,\s*126cqh\)/);
+  assert.match(css, /\.board\s*\{[^}]*max-height:\s*calc\(100% - 1\.375rem\)/);
+  assert.match(css, /\.board\s*\{[^}]*width:\s*min\(100%,\s*132cqh\)/);
+});
+
+test("V2 scales game lettering down on wide landscape screens and resyncs after rotation", async () => {
+  const [app, css] = await Promise.all([
+    readFile(new URL("../public/v2/scripts/app.js", import.meta.url), "utf8"),
+    readFile(new URL("../public/v2/styles.css", import.meta.url), "utf8")
+  ]);
+  assert.match(css, /@media\s*\(orientation:\s*landscape\)\s*and\s*\(min-width:\s*50rem\)/);
+  assert.match(css, /\.tile\s*\{\s*font-size:\s*clamp\(\.9rem,\s*2\.6vh,\s*1\.35rem\)/);
+  assert.match(css, /\.key\s*\{\s*font-size:\s*clamp\(\.65rem,\s*2vh,\s*\.95rem\)/);
+  assert.match(app, /orientationchange",\s*syncViewportAfterOrientationChange/);
+  assert.match(app, /\[120,\s*320\]\.map\(\(delay\)\s*=>\s*setTimeout\(syncViewportHeight,\s*delay\)\)/);
 });
 
 test("V2 replay keeps a softly fading image header without extra labels", async () => {

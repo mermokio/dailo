@@ -64,7 +64,7 @@ main { display: flex; height: auto; min-height: 0; flex: 1 1 auto; flex-directio
 .game-card-topline::before, .game-card-topline::after { align-self: center; color: #76b6a6; font-size: 1.4em; letter-spacing: -.2em; }
 .game-card-topline::before { content: "≈"; order: -1; }
 .game-card-topline::after { content: "≈"; }
-.board { position: relative; height: auto; width: min(100%, 126cqh); max-width: 100%; max-height: calc(100% - 2.75rem); flex: 0 1 auto; aspect-ratio: 4 / 3; align-self: center; background: url("./assets/board-background-v2.png") center / 100% 100% no-repeat; filter: drop-shadow(0 7px 11px rgba(55, 93, 79, .16)); }
+.board { position: relative; height: auto; width: min(100%, 132cqh); max-width: 100%; max-height: calc(100% - 1.375rem); flex: 0 1 auto; aspect-ratio: 4 / 3; align-self: center; background: url("./assets/board-background-v2.png") center / 100% 100% no-repeat; filter: drop-shadow(0 7px 11px rgba(55, 93, 79, .16)); }
 .board-row { position: absolute; left: 19.25%; display: grid; width: 61.5%; height: 14.5%; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1.45%; }
 .board-row:nth-child(1) { top: 6.15%; }
 .board-row:nth-child(2) { top: 20.78%; }
@@ -188,7 +188,7 @@ main { display: flex; height: auto; min-height: 0; flex: 1 1 auto; flex-directio
   .game-pill { width: clamp(1.65rem, 3.5vw, 1.85rem); }
   .game-card { width: 100%; min-height: 0; padding: 0; }
   .game-card-topline { top: .1rem; width: min(100%, 145cqh); padding-inline: .2rem; font-size: .48rem; letter-spacing: .06em; }
-  .board { width: min(100%, 126cqh); }
+  .board { width: min(100%, 132cqh); }
   .game-card-topline::before, .game-card-topline::after { display: none; }
   .game-message { display: none; }
   .share-result-button { height: 1.8rem; margin-block: .05rem; }
@@ -199,6 +199,10 @@ main { display: flex; height: auto; min-height: 0; flex: 1 1 auto; flex-directio
   .keyboard-row { gap: .15rem; }
   .key { height: clamp(1.2rem, 5.7vh, 1.75rem); font-size: clamp(.62rem, 2.4vh, .8rem); }
   .app-version { margin-top: .06rem; }
+}
+@media (orientation: landscape) and (min-width: 50rem) {
+  .tile { font-size: clamp(.9rem, 2.6vh, 1.35rem); }
+  .key { font-size: clamp(.65rem, 2vh, .95rem); }
 }
 @media (max-width: 370px) {
   .app-shell { padding-right: max(.42rem, env(safe-area-inset-right)); padding-left: max(.42rem, env(safe-area-inset-left)); }
