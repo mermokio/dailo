@@ -12,7 +12,7 @@
     <link rel="icon" href="./assets/icon-home.png" type="image/png" />
     <link rel="apple-touch-icon" href="./assets/icon-home.png" />
     <link rel="preload" href="./assets/board-background-v2.png" as="image" />
-    <link rel="stylesheet" href="./styles.css?v=2.0.9" />
+    <link rel="stylesheet" href="./styles.css?v=2.0.10" />
     <title>Dailo — V2 daily word trio</title>
   </head>
   <body>
@@ -41,7 +41,7 @@
           </nav>
 
           <section class="game-card" aria-label="Word game">
-            <div class="game-card-topline"><p id="game-kicker">Game 1 of 3</p><p id="game-progress">0 / 6 guesses</p></div>
+            <div class="game-card-topline" aria-hidden="true"><p id="game-kicker">Game 1 of 3</p><p id="game-progress">0 / 6 guesses</p></div>
             <div class="board" id="board" aria-label="Six rows of five letter tiles" aria-live="polite"></div>
             <div class="game-message" id="game-message" aria-live="polite"></div>
             <button class="share-result-button" id="share-result-button" type="button" hidden>
@@ -56,7 +56,7 @@
           <button class="submit-guess-button" id="submit-guess-button" type="button" aria-label="Submit guess" disabled><span>Submit guess</span></button>
           <div class="keyboard" id="keyboard"></div>
         </section>
-        <p class="app-version" aria-label="App version">v2.0.9 · preview</p>
+        <p class="app-version" aria-label="App version">v2.0.10 · preview</p>
       </div>
     </div>
 
@@ -75,6 +75,6 @@
       <div class="modal-sheet"><button class="modal-close" type="button" data-close aria-label="Close">×</button><p class="eyebrow">Made to share</p><h2>Nice one.</h2><canvas id="share-canvas" width="1080" height="1350" aria-label="Preview of your share image"></canvas><div class="share-actions"><button class="primary-button" id="native-share-button" type="button">Share image</button><button class="secondary-button" id="share-emoji-button" type="button">Share emoji result</button></div></div>
     </dialog>
 
-    <script type="module" src="./scripts/app.js?v=2.0.9"></script>
+    <script type="module" src="./scripts/app.js?v=2.0.10"></script>
   </body>
 </html>
