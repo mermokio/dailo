@@ -33,23 +33,23 @@ button:focus-visible, a:focus-visible, [role="button"]:focus-visible { outline: 
 .app-shell { position: relative; z-index: 1; display: flex; flex-direction: column; width: min(100%, 78rem); height: var(--app-height); margin: 0 auto; padding: env(safe-area-inset-top) max(.7rem, env(safe-area-inset-right)) 0 max(.7rem, env(safe-area-inset-left)); }
 .top-screen { display: flex; min-height: 0; flex: 1 1 auto; flex-direction: column; }
 .bottom-screen { display: flex; flex: 0 0 auto; flex-direction: column; margin-top: auto; }
-.topbar { display: grid; position: relative; grid-template-columns: 3.1rem minmax(0,1fr) 3.1rem; align-items: center; height: clamp(5.5rem, 18vw, 9rem); min-height: 5.5rem; flex: 0 0 auto; padding: .25rem .2rem; }
+.topbar { display: grid; position: relative; grid-template-columns: 2.7rem minmax(0,1fr) 2.7rem; align-items: center; height: clamp(4.8rem, 16vw, 8rem); min-height: 4.8rem; flex: 0 0 auto; padding: .2rem .2rem; }
 .topbar::before { position: absolute; z-index: -1; inset: 0 calc(-1 * max(.7rem, env(safe-area-inset-right))) 0 calc(-1 * max(.7rem, env(safe-area-inset-left))); background-image: linear-gradient(180deg, rgba(232,249,246,.02), rgba(236,249,239,.28)), url("./assets/header-background.png"); background-position: center top; background-size: cover; -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%); content: ""; }
 .brand { display: flex; min-width: 0; align-items: center; justify-content: center; gap: clamp(.55rem, 2vw, 1.1rem); color: inherit; text-decoration: none; }
-.brand-icon { display: block; width: clamp(3.1rem, 11.5vw, 5.8rem); height: clamp(3.1rem, 11.5vw, 5.8rem); object-fit: contain; filter: drop-shadow(0 6px 7px rgba(30, 72, 71, .23)); }
-.brand-wordmark { display: block; width: min(clamp(6.8rem, 29vw, 15rem), 44vw); max-height: clamp(2.45rem, 9vw, 4.6rem); object-fit: contain; filter: drop-shadow(0 3px 3px rgba(255,255,255,.25)); }
-.icon-button { display: grid; width: clamp(2.25rem, 6.8vw, 2.9rem); height: clamp(2.25rem, 6.8vw, 2.9rem); padding: 0; place-items: center; border: 1px solid rgba(255,255,255,.8); border-radius: 50%; background: rgba(255, 252, 239, .82); box-shadow: 0 5px 12px rgba(37, 77, 72, .17), inset 0 1px 1px #fff; color: var(--ink); cursor: pointer; transition: transform 150ms ease; }
+.brand-icon { display: block; width: clamp(2.8rem, 10vw, 5.1rem); height: clamp(2.8rem, 10vw, 5.1rem); object-fit: contain; filter: drop-shadow(0 5px 6px rgba(30, 72, 71, .2)); }
+.brand-wordmark { display: block; width: min(clamp(6rem, 26vw, 12.5rem), 40vw); max-height: clamp(2.2rem, 8vw, 4rem); object-fit: contain; filter: drop-shadow(0 3px 3px rgba(255,255,255,.25)); }
+.icon-button { display: grid; width: clamp(2rem, 6vw, 2.6rem); height: clamp(2rem, 6vw, 2.6rem); padding: 0; place-items: center; border: 1px solid rgba(255,255,255,.8); border-radius: 50%; background: rgba(255, 252, 239, .82); box-shadow: 0 4px 9px rgba(37, 77, 72, .15), inset 0 1px 1px #fff; color: var(--ink); cursor: pointer; transition: transform 150ms ease; }
 .icon-button:active { transform: scale(.93); }
-.icon-button span { font-family: "Playfair Display", Georgia, serif; font-size: 1.3rem; font-weight: 800; }
+.icon-button span { font-family: "Playfair Display", Georgia, serif; font-size: 1.15rem; font-weight: 800; }
 .icon-button svg { width: 1.25rem; fill: currentColor; }
 
 main { display: flex; height: auto; min-height: 0; flex: 1 1 auto; flex-direction: column; }
 .day-heading { display: flex; align-items: flex-end; justify-content: space-between; flex: 0 0 auto; padding: 1.05rem .25rem .8rem; }
 .eyebrow { margin: 0 0 .18rem; color: #4d9587; font-size: .68rem; font-weight: 800; letter-spacing: .17em; text-transform: uppercase; }
 .day-heading h1 { margin: 0; font-family: "Playfair Display", Georgia, serif; font-size: clamp(1.32rem, 5.1vw, 2.3rem); line-height: 1.1; letter-spacing: -.035em; color: #174e4a; text-shadow: 0 1px rgba(255,255,255,.55); }
-.streak-chip { display: flex; align-items: center; justify-content: center; gap: .35rem; min-width: 4.4rem; height: 2.5rem; padding: 0 .8rem; border: 1px solid rgba(209, 154, 26, .55); border-radius: 999px; background: linear-gradient(180deg, #fffdf3, #f8e7af); box-shadow: 0 3px 10px rgba(179, 126, 18, .17), inset 0 1px white; color: var(--ink-deep); cursor: pointer; }
-.streak-chip span { font-size: 1.25rem; }
-.streak-chip strong { font: 800 1.15rem "Playfair Display", Georgia, serif; }
+.streak-chip { display: flex; align-items: center; justify-content: center; gap: .25rem; min-width: 3.8rem; height: 2.15rem; padding: 0 .55rem; border: 1px solid rgba(209, 154, 26, .55); border-radius: 999px; background: linear-gradient(180deg, #fffdf3, #f8e7af); box-shadow: 0 3px 8px rgba(179, 126, 18, .15), inset 0 1px white; color: var(--ink-deep); cursor: pointer; }
+.streak-chip span { font-size: 1.05rem; }
+.streak-chip strong { font: 800 1rem "Playfair Display", Georgia, serif; }
 
 .game-switcher { display: grid; width: min(100%, 24rem); grid-template-columns: auto minmax(0,1fr) auto minmax(0,1fr) auto; align-items: center; align-self: center; flex: 0 0 auto; gap: 0; margin: .55rem 0 .85rem; padding: .3rem 0; }
 .game-rail { height: 3px; background: linear-gradient(90deg, rgba(74,142,127,.25), rgba(47,130,116,.72), rgba(74,142,127,.25)); }
@@ -64,7 +64,7 @@ main { display: flex; height: auto; min-height: 0; flex: 1 1 auto; flex-directio
 .game-card-topline::before, .game-card-topline::after { align-self: center; color: #76b6a6; font-size: 1.4em; letter-spacing: -.2em; }
 .game-card-topline::before { content: "≈"; order: -1; }
 .game-card-topline::after { content: "≈"; }
-.board { position: relative; height: auto; width: min(100%, 112cqh); max-width: 100%; max-height: calc(100% - 4.25rem); flex: 0 1 auto; aspect-ratio: 4 / 3; align-self: center; background: url("./assets/board-background-v2.png") center / 100% 100% no-repeat; filter: drop-shadow(0 7px 11px rgba(55, 93, 79, .16)); }
+.board { position: relative; height: auto; width: min(100%, 126cqh); max-width: 100%; max-height: calc(100% - 2.75rem); flex: 0 1 auto; aspect-ratio: 4 / 3; align-self: center; background: url("./assets/board-background-v2.png") center / 100% 100% no-repeat; filter: drop-shadow(0 7px 11px rgba(55, 93, 79, .16)); }
 .board-row { position: absolute; left: 19.25%; display: grid; width: 61.5%; height: 14.5%; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1.45%; }
 .board-row:nth-child(1) { top: 6.15%; }
 .board-row:nth-child(2) { top: 20.78%; }
@@ -163,9 +163,9 @@ main { display: flex; height: auto; min-height: 0; flex: 1 1 auto; flex-directio
   .game-message { display: none; }
 }
 @media (max-height: 720px) {
-  .topbar { height: clamp(4.2rem, 15vh, 6.5rem); min-height: 4.2rem; }
-  .brand-icon { width: clamp(3rem, 10vh, 4.5rem); height: clamp(3rem, 10vh, 4.5rem); }
-  .brand-wordmark { width: clamp(6.6rem, 24vh, 11.5rem); }
+  .topbar { height: clamp(3.8rem, 14vh, 5.8rem); min-height: 3.8rem; }
+  .brand-icon { width: clamp(2.7rem, 9vh, 4rem); height: clamp(2.7rem, 9vh, 4rem); }
+  .brand-wordmark { width: clamp(6.2rem, 22vh, 10.5rem); }
   .day-heading { padding-top: .45rem; padding-bottom: .35rem; }
   .day-heading h1 { font-size: clamp(1rem, 4.2vw, 1.65rem); }
   .game-switcher { margin: .3rem 0 .55rem; padding-block: .28rem; }
@@ -178,17 +178,17 @@ main { display: flex; height: auto; min-height: 0; flex: 1 1 auto; flex-directio
 @media (orientation: landscape) and (max-height: 560px) {
   .app-shell { display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); }
   .top-screen { display: flex; min-height: 0; flex: 1 1 auto; }
-  .topbar { height: 3.1rem; min-height: 3.1rem; }
+  .topbar { height: 2.7rem; min-height: 2.7rem; }
   .brand { gap: .5rem; }
-  .brand-icon { width: 2.55rem; height: 2.55rem; }
-  .brand-wordmark { width: 6.6rem; max-height: 2.3rem; }
+  .brand-icon { width: 2.2rem; height: 2.2rem; }
+  .brand-wordmark { width: 5.8rem; max-height: 2rem; }
   main { display: flex; min-height: 0; flex: 1 1 auto; flex-direction: column; }
   .day-heading { display: none; }
   .game-switcher { width: min(100%, 12rem); margin: .45rem 0 .55rem; padding: .25rem 0; }
   .game-pill { width: clamp(1.65rem, 3.5vw, 1.85rem); }
   .game-card { width: 100%; min-height: 0; padding: 0; }
   .game-card-topline { top: .1rem; width: min(100%, 145cqh); padding-inline: .2rem; font-size: .48rem; letter-spacing: .06em; }
-  .board { width: min(100%, 112cqh); }
+  .board { width: min(100%, 126cqh); }
   .game-card-topline::before, .game-card-topline::after { display: none; }
   .game-message { display: none; }
   .share-result-button { height: 1.8rem; margin-block: .05rem; }

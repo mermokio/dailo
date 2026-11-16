@@ -199,6 +199,6 @@ test("V2 reserves space between its board and keyboard and hides the keyboard on
   assert.match(app, /keyboardWrap\.hidden = game\.status !== "playing"/);
   assert.match(css, /\.keyboard-wrap\[hidden\]\s*\{\s*display:\s*none !important/);
   assert.match(css, /\.game-card\s*\{[^}]*display:\s*flex/);
-  assert.match(css, /\.board\s*\{[^}]*max-height:\s*calc\(100% - 4\.25rem\)/);
-  assert.match(css, /\.board\s*\{[^}]*width:\s*min\(100%,\s*112cqh\)/);
+  assert.match(css, /\.board\s*\{[^}]*max-height:\s*calc\(100% - 2\.75rem\)/);
+  assert.match(css, /\.board\s*\{[^}]*width:\s*min\(100%,\s*126cqh\)/);
 });
