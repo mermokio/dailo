@@ -154,7 +154,7 @@ main { display: flex; height: auto; min-height: 0; flex: 1 1 auto; flex-directio
   .game-switcher { width: min(100%, 24rem); padding-inline: 0; }
   .game-card { padding-inline: 1.5rem; }
 }
-@media (min-width: 40rem) {
+@media (min-width: 27rem) and (orientation: portrait) {
   body::before { top: calc(-1 * env(safe-area-inset-top)); height: calc(env(safe-area-inset-top) + clamp(4.8rem, 16vw, 8rem)); background-image: linear-gradient(180deg, rgba(232,249,246,.02), rgba(236,249,239,.28)), url("./assets/header-background.png"); background-position: center top; background-size: cover; -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%); }
   .topbar::before { content: none; }
 }
