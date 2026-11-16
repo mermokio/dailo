@@ -188,3 +188,17 @@ test("submit is hidden only when the selected game is finished", async () => {
   assert.match(app, /els\.submitButton\.hidden = game\.status !== "playing"/);
   assert.match(app, /els\.shareButton\.hidden = game\.status === "playing"/);
 });
+
+test("V2 reserves space between its board and keyboard and hides the keyboard on completion", async () => {
+  const [html, app, css] = await Promise.all([
+    readFile(new URL("../public/v2/index.html", import.meta.url), "utf8"),
+    readFile(new URL("../public/v2/scripts/app.js", import.meta.url), "utf8"),
+    readFile(new URL("../public/v2/styles.css", import.meta.url), "utf8")
+  ]);
+  assert.match(html, /id="keyboard-wrap"/);
+  assert.match(app, /keyboardWrap\.hidden = game\.status !== "playing"/);
+  assert.match(css, /\.keyboard-wrap\[hidden\]\s*\{\s*display:\s*none !important/);
+  assert.match(css, /\.game-card\s*\{[^}]*display:\s*flex/);
+  assert.match(css, /\.board\s*\{[^}]*max-height:\s*calc\(100% - 4\.25rem\)/);
+  assert.match(css, /\.board\s*\{[^}]*width:\s*min\(100%,\s*112cqh\)/);
+});

@@ -26,6 +26,7 @@ shareIcon.src = new URL("../assets/icon-home.png", import.meta.url).href;
 const els = {
   board: document.querySelector("#board"),
   keyboard: document.querySelector("#keyboard"),
+  keyboardWrap: document.querySelector("#keyboard-wrap"),
   dateLabel: document.querySelector("#date-label"),
   gameKicker: document.querySelector("#game-kicker"),
   gameProgress: document.querySelector("#game-progress"),
@@ -157,6 +158,7 @@ function render() {
   renderStats();
   els.shareButton.hidden = game.status === "playing";
   els.submitButton.hidden = game.status !== "playing";
+  els.keyboardWrap.hidden = game.status !== "playing";
   els.submitButton.disabled = game.status !== "playing" || game.draft.some((letter) => !letter);
 }
 
