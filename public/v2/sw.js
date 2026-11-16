@@ -1,4 +1,4 @@
-const CACHE_NAME = "dailo-v2-preview-2.0.12";
+const CACHE_NAME = "dailo-v2-preview-2.0.13";
 const CORE_ASSETS = [
   "./",
   "./index.html",

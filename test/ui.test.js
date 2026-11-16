@@ -202,3 +202,12 @@ test("V2 reserves space between its board and keyboard and hides the keyboard on
   assert.match(css, /\.board\s*\{[^}]*max-height:\s*calc\(100% - 2\.75rem\)/);
   assert.match(css, /\.board\s*\{[^}]*width:\s*min\(100%,\s*126cqh\)/);
 });
+
+test("V2 replay keeps a softly fading image header without extra labels", async () => {
+  const [html, css] = await Promise.all([
+    readFile(new URL("../public/v2/replay.html", import.meta.url), "utf8"),
+    readFile(new URL("../public/v2/replay.css", import.meta.url), "utf8")
+  ]);
+  assert.doesNotMatch(html, /THE COLORS TELL THE STORY|Shared replay/);
+  assert.match(css, /body::before\s*\{[^}]*mask-image:\s*linear-gradient\(to bottom/);
+});
