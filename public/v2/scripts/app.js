@@ -59,6 +59,10 @@ function syncViewportHeight() {
   viewportSyncFrame = requestAnimationFrame(() => {
     const height = window.visualViewport?.height || window.innerHeight;
     document.documentElement.style.setProperty("--app-height", `${Math.round(height)}px`);
+    requestAnimationFrame(() => {
+      const settledHeight = window.visualViewport?.height || window.innerHeight;
+      document.documentElement.style.setProperty("--app-height", `${Math.round(settledHeight)}px`);
+    });
   });
 }
 
@@ -84,6 +88,7 @@ colorScheme.addEventListener?.("change", syncThemeColor);
 window.addEventListener("resize", syncViewportHeight);
 window.addEventListener("orientationchange", syncViewportAfterOrientationChange);
 window.visualViewport?.addEventListener("resize", syncViewportHeight);
+window.visualViewport?.addEventListener("scroll", syncViewportHeight);
 
 function hasVerticallyStackedSegments() {
   try {
