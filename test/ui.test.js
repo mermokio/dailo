@@ -220,6 +220,8 @@ test("V2 scales game lettering down in landscape and resamples viewport height a
   assert.match(css, /\.app-shell\s*\{[^}]*overflow:\s*hidden/);
   assert.match(css, /\.app-shell\s*\{[^}]*padding:\s*0 max\(\.7rem, env\(safe-area-inset-right\)\) 0 max\(\.7rem, env\(safe-area-inset-left\)\)/);
   assert.doesNotMatch(css, /\.app-shell\s*\{[^}]*padding-top:\s*env\(safe-area-inset-top\)/);
+  assert.match(css, /body::before\s*\{[^}]*top:\s*calc\(-1 \* env\(safe-area-inset-top\)\)[^}]*header-background\.png/);
+  assert.match(css, /\.topbar::before\s*\{\s*content:\s*none/);
   assert.doesNotMatch(css, /html\s*\{[^}]*overflow:\s*hidden/);
 });
 
