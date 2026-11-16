@@ -251,7 +251,7 @@ function renderMessage(game, answer) {
   } else if (game.status === "lost") {
     els.gameMessage.innerHTML = `<span>Today's word was <strong>${answer.toUpperCase()}</strong></span>`;
   } else {
-    els.gameMessage.innerHTML = "<span>Tap a tile to place letters in any order</span>";
+    els.gameMessage.replaceChildren();
   }
 }
 

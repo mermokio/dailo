@@ -12,7 +12,7 @@
     <link rel="icon" href="./assets/icon-home.png" type="image/png" />
     <link rel="apple-touch-icon" href="./assets/icon-home.png" />
     <link rel="preload" href="./assets/board-background.png" as="image" />
-    <link rel="stylesheet" href="./styles.css?v=2.0.5" />
+    <link rel="stylesheet" href="./styles.css?v=2.0.6" />
     <title>Dailo — V2 daily word trio</title>
   </head>
   <body>
@@ -43,7 +43,7 @@
           <section class="game-card" aria-label="Word game">
             <div class="game-card-topline"><p id="game-kicker">Game 1 of 3</p><p id="game-progress">0 / 6 guesses</p></div>
             <div class="board" id="board" aria-label="Six rows of five letter tiles" aria-live="polite"></div>
-            <div class="game-message" id="game-message" aria-live="polite"><span>Tap a tile to place letters in any order</span></div>
+            <div class="game-message" id="game-message" aria-live="polite"></div>
             <button class="share-result-button" id="share-result-button" type="button" hidden>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.1c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.03-.47-.09-.7l7.05-4.11A2.99 2.99 0 1 0 15 5c0 .24.04.47.09.7L8.04 9.81A3 3 0 1 0 6 15c.79 0 1.5-.31 2.04-.81l7.09 4.14c-.05.21-.08.43-.08.67a2.95 2.95 0 1 0 2.95-2.9Z"/></svg>Share this game
             </button>
@@ -56,7 +56,7 @@
           <button class="submit-guess-button" id="submit-guess-button" type="button" aria-label="Submit guess" disabled><span>Submit guess</span></button>
           <div class="keyboard" id="keyboard"></div>
         </section>
-        <p class="app-version" aria-label="App version">v2.0.5 · preview</p>
+        <p class="app-version" aria-label="App version">v2.0.6 · preview</p>
       </div>
     </div>
 
@@ -75,6 +75,6 @@
       <div class="modal-sheet"><button class="modal-close" type="button" data-close aria-label="Close">×</button><p class="eyebrow">Made to share</p><h2>Nice one.</h2><canvas id="share-canvas" width="1080" height="1350" aria-label="Preview of your share image"></canvas><div class="share-actions"><button class="primary-button" id="native-share-button" type="button">Share image</button><button class="secondary-button" id="share-emoji-button" type="button">Share emoji result</button></div></div>
     </dialog>
 
-    <script type="module" src="./scripts/app.js?v=2.0.5"></script>
+    <script type="module" src="./scripts/app.js?v=2.0.6"></script>
   </body>
 </html>
