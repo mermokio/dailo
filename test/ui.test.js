@@ -215,6 +215,8 @@ test("V2 scales game lettering down in landscape and resamples viewport height a
   assert.match(app, /orientationSyncTimers\s*=\s*\[100,\s*260,\s*520\]/);
   assert.match(app, /setProperty\("--app-height",\s*`\$\{Math\.round\(height\)\}px`\)/);
   assert.match(css, /\.app-shell\s*\{[^}]*position:\s*relative[^}]*height:\s*var\(--app-height\)/);
+  assert.match(css, /\.app-shell\s*\{[^}]*padding:\s*0 max\(\.7rem, env\(safe-area-inset-right\)\) 0 max\(\.7rem, env\(safe-area-inset-left\)\)/);
+  assert.doesNotMatch(css, /\.app-shell\s*\{[^}]*padding-top:\s*env\(safe-area-inset-top\)/);
   assert.match(css, /html\s*\{[^}]*min-height:\s*100dvh/);
 });
 

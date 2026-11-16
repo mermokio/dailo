@@ -30,7 +30,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 button { font: inherit; }
 button:focus-visible, a:focus-visible, [role="button"]:focus-visible { outline: 3px solid #d5a525; outline-offset: 3px; }
 
-.app-shell { position: relative; z-index: 1; display: flex; flex-direction: column; width: min(100%, 78rem); height: var(--app-height); margin: 0 auto; padding: env(safe-area-inset-top) max(.7rem, env(safe-area-inset-right)) 0 max(.7rem, env(safe-area-inset-left)); }
+.app-shell { position: relative; z-index: 1; display: flex; flex-direction: column; width: min(100%, 78rem); height: var(--app-height); margin: 0 auto; padding: 0 max(.7rem, env(safe-area-inset-right)) 0 max(.7rem, env(safe-area-inset-left)); }
 .top-screen { display: flex; min-height: 0; flex: 1 1 auto; flex-direction: column; }
 .bottom-screen { display: flex; flex: 0 0 auto; flex-direction: column; margin-top: auto; }
 .topbar { display: grid; position: relative; grid-template-columns: 2.7rem minmax(0,1fr) 2.7rem; align-items: center; height: clamp(4.8rem, 16vw, 8rem); min-height: 4.8rem; flex: 0 0 auto; padding: .2rem .2rem; }
@@ -176,7 +176,7 @@ main { display: flex; height: auto; min-height: 0; flex: 1 1 auto; flex-directio
   .keyboard-wrap { padding-top: 0; }
 }
 @media (orientation: landscape) and (max-height: 560px) {
-  .app-shell { display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); }
+  .app-shell { display: flex; flex-direction: column; }
   .top-screen { display: flex; min-height: 0; flex: 1 1 auto; }
   .topbar { height: 2.7rem; min-height: 2.7rem; }
   .brand { gap: .5rem; }
