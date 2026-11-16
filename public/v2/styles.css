@@ -6,14 +6,14 @@
   --green: #4f9a61;
   --gold: #d8a723;
   --line: rgba(35, 88, 76, .2);
-  --app-height: 100dvh;
+  --app-height: 100vh;
   font-family: "DM Sans", "Avenir Next", system-ui, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
 
 * { box-sizing: border-box; }
-html { width: 100%; height: 100%; overflow: hidden; background: #dff3f0; touch-action: manipulation; overscroll-behavior: none; }
+html { width: 100%; height: 100%; min-height: 100vh; min-height: 100dvh; overflow: hidden; background: #dff3f0; touch-action: manipulation; overscroll-behavior: none; }
 body {
   min-width: 320px;
   width: 100%;
@@ -30,7 +30,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 button { font: inherit; }
 button:focus-visible, a:focus-visible, [role="button"]:focus-visible { outline: 3px solid #d5a525; outline-offset: 3px; }
 
-.app-shell { position: fixed; z-index: 1; inset: 0 0 auto; display: flex; flex-direction: column; width: min(100%, 78rem); height: 100dvh; margin: 0 auto; padding: env(safe-area-inset-top) max(.7rem, env(safe-area-inset-right)) 0 max(.7rem, env(safe-area-inset-left)); }
+.app-shell { position: relative; z-index: 1; display: flex; flex-direction: column; width: min(100%, 78rem); height: var(--app-height); margin: 0 auto; padding: env(safe-area-inset-top) max(.7rem, env(safe-area-inset-right)) 0 max(.7rem, env(safe-area-inset-left)); }
 .top-screen { display: flex; min-height: 0; flex: 1 1 auto; flex-direction: column; }
 .bottom-screen { display: flex; flex: 0 0 auto; flex-direction: column; margin-top: auto; }
 .topbar { display: grid; position: relative; grid-template-columns: 2.7rem minmax(0,1fr) 2.7rem; align-items: center; height: clamp(4.8rem, 16vw, 8rem); min-height: 4.8rem; flex: 0 0 auto; padding: .2rem .2rem; }

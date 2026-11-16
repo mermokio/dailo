@@ -51,6 +51,22 @@ let state = loadState();
 let activeGame = Number(state.activeGame) || 0;
 let selectedTileIndex = 0;
 let isAnimating = false;
+let viewportSyncFrame = 0;
+let orientationSyncTimers = [];
+
+function syncViewportHeight() {
+  cancelAnimationFrame(viewportSyncFrame);
+  viewportSyncFrame = requestAnimationFrame(() => {
+    const height = window.visualViewport?.height || window.innerHeight;
+    document.documentElement.style.setProperty("--app-height", `${Math.round(height)}px`);
+  });
+}
+
+function syncViewportAfterOrientationChange() {
+  orientationSyncTimers.forEach(clearTimeout);
+  syncViewportHeight();
+  orientationSyncTimers = [100, 260, 520].map((delay) => setTimeout(syncViewportHeight, delay));
+}
 
 function syncThemeColor() {
   const lightColor = document.querySelector('meta[name="theme-color"][media*="light"]');
@@ -61,9 +77,13 @@ function syncThemeColor() {
 
 const stackedSegmentsQuery = window.matchMedia("(vertical-viewport-segments: 2)");
 
+syncViewportHeight();
 const colorScheme = window.matchMedia("(prefers-color-scheme: light)");
 syncThemeColor(colorScheme);
 colorScheme.addEventListener?.("change", syncThemeColor);
+window.addEventListener("resize", syncViewportHeight);
+window.addEventListener("orientationchange", syncViewportAfterOrientationChange);
+window.visualViewport?.addEventListener("resize", syncViewportHeight);
 
 function hasVerticallyStackedSegments() {
   try {

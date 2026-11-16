@@ -203,7 +203,7 @@ test("V2 reserves space between its board and keyboard and hides the keyboard on
   assert.match(css, /\.board\s*\{[^}]*width:\s*min\(100%,\s*132cqh\)/);
 });
 
-test("V2 scales game lettering down in landscape and lets CSS track rotated viewport height", async () => {
+test("V2 scales game lettering down in landscape and resamples viewport height after rotation", async () => {
   const [app, css] = await Promise.all([
     readFile(new URL("../public/v2/scripts/app.js", import.meta.url), "utf8"),
     readFile(new URL("../public/v2/styles.css", import.meta.url), "utf8")
@@ -211,8 +211,11 @@ test("V2 scales game lettering down in landscape and lets CSS track rotated view
   assert.match(css, /@media\s*\(orientation:\s*landscape\)\s*and\s*\(min-width:\s*50rem\)/);
   assert.match(css, /\.tile\s*\{\s*font-size:\s*clamp\(\.9rem,\s*2\.6vh,\s*1\.35rem\)/);
   assert.match(css, /\.key\s*\{\s*font-size:\s*clamp\(\.65rem,\s*2vh,\s*\.95rem\)/);
-  assert.doesNotMatch(app, /syncViewportHeight|setProperty\("--app-height"/);
-  assert.match(css, /\.app-shell\s*\{[^}]*position:\s*fixed[^}]*inset:\s*0 0 auto[^}]*height:\s*100dvh/);
+  assert.match(app, /visualViewport\?\.addEventListener\("resize",\s*syncViewportHeight\)/);
+  assert.match(app, /orientationSyncTimers\s*=\s*\[100,\s*260,\s*520\]/);
+  assert.match(app, /setProperty\("--app-height",\s*`\$\{Math\.round\(height\)\}px`\)/);
+  assert.match(css, /\.app-shell\s*\{[^}]*position:\s*relative[^}]*height:\s*var\(--app-height\)/);
+  assert.match(css, /html\s*\{[^}]*min-height:\s*100dvh/);
 });
 
 test("V2 replay keeps a softly fading image header without extra labels", async () => {
