@@ -1,4 +1,4 @@
-const CACHE_NAME = "dailo-v2-preview-2.0.8";
+const CACHE_NAME = "dailo-v2-preview-2.0.9";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -14,7 +14,7 @@ const CORE_ASSETS = [
   "./assets/wordmark.png",
   "./assets/header-background.png",
   "./assets/footer-background.png",
-  "./assets/board-background.png",
+  "./assets/board-background-v2.png",
   "./assets/submit-button.png",
   "./assets/tile-empty.png",
   "./assets/tile-correct.png",
