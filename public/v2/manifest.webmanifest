@@ -1,0 +1,12 @@
+{
+  "name": "Dailo V2",
+  "short_name": "Dailo V2",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#e8f4ed",
+  "theme_color": "#dff3f0",
+  "icons": [
+    { "src": "./assets/icon-home.png", "sizes": "any", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
