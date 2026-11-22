@@ -9,14 +9,20 @@
     <meta name="description" content="Reveal a shared Dailo V2 word game." />
     <link rel="icon" href="../assets/icon-lighthouse-192.png" type="image/png" media="(prefers-color-scheme: light)" />
     <link rel="icon" href="./assets/dark/install-icon-192.png" type="image/png" media="(prefers-color-scheme: dark)" />
-    <link rel="stylesheet" href="./replay.css?v=2.0.24" />
-    <link rel="stylesheet" href="./night.css?v=2.0.24" />
+    <link rel="stylesheet" href="./replay.css?v=2.0.25" />
+    <link rel="stylesheet" href="./night.css?v=2.0.25" />
     <title>Dailo V2 replay</title>
   </head>
   <body>
     <main class="replay-shell" id="replay-root">
       <header class="replay-header">
-        <a href="./" class="replay-brand" aria-label="Dailo V2 home"><img class="replay-icon" src="./assets/icon-home.png" alt="" /><img class="replay-wordmark" src="./assets/wordmark.png" alt="Dailo" /></a>
+        <a href="./" class="replay-brand" aria-label="Dailo V2 home">
+          <picture>
+            <source srcset="./assets/dark/header-icon.webp" media="(prefers-color-scheme: dark)" />
+            <img class="replay-icon" src="./assets/icon-home.png" alt="" />
+          </picture>
+          <img class="replay-wordmark" src="./assets/wordmark.png" alt="Dailo" />
+        </a>
       </header>
       <section class="replay-content" aria-labelledby="replay-title">
         <h1 id="replay-title">A daily word, replayed.</h1>
@@ -25,7 +31,7 @@
         <button class="reveal-button" id="reveal-button" type="button">Reveal guessed letters</button>
         <p class="replay-error" id="replay-error" hidden>This replay link is invalid or incomplete.</p>
       </section>
-      <p class="replay-version" aria-label="App version">v2.0.24 · preview</p>
+      <p class="replay-version" aria-label="App version">v2.0.25 · preview</p>
     </main>
     <script defer src="./scripts/replay.js"></script>
   </body>

@@ -7,7 +7,7 @@ body::after { bottom: 0; height: clamp(6rem,24vw,13rem); background: url("./asse
 .replay-shell { position: relative; z-index: 1; display: flex; flex-direction: column; width: min(100%, 74rem); height: 100vh; height: 100dvh; min-height: 0; margin: 0 auto; padding: max(.5rem,env(safe-area-inset-top)) max(.65rem,env(safe-area-inset-right)) max(.5rem,env(safe-area-inset-bottom)) max(.65rem,env(safe-area-inset-left)); }
 .replay-header { display: flex; align-items: center; justify-content: space-between; min-height: clamp(3.2rem,10vh,5rem); padding: .2rem .2rem .5rem; border-bottom: 1px solid var(--line); }
 .replay-brand { display: inline-flex; align-items: center; gap: .5rem; color: var(--ink); text-decoration: none; }
-.replay-icon { width: clamp(2.4rem,8vh,4rem); height: clamp(2.4rem,8vh,4rem); object-fit: contain; }
+.replay-icon { display: block; width: clamp(2.4rem,8vh,4rem); height: clamp(2.4rem,8vh,4rem); object-fit: contain; }
 .replay-wordmark { width: clamp(7rem,22vh,12rem); max-height: 3.5rem; object-fit: contain; }
 .replay-content { display: flex; width: min(100%, 40rem); flex: 1 1 auto; min-height: 0; flex-direction: column; align-items: center; justify-content: center; align-self: center; padding: .5rem 0; text-align: center; }
 h1 { margin: 0; font: 800 clamp(1.5rem,5vw,2.6rem)/1.06 "Playfair Display", Georgia, serif; letter-spacing: -.045em; }
