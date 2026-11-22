@@ -1,6 +1,7 @@
 {
-  "name": "Dailo V2",
-  "short_name": "Dailo V2",
+  "name": "Dailo — Daily Word Trio",
+  "short_name": "Dailo",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

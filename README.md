@@ -32,7 +32,7 @@ The local calendar date and game number are hashed with a versioned seed. The re
 
 ## Deploy
 
-The workflow in `.github/workflows/deploy-pages.yml` publishes `public/` to GitHub Pages whenever a commit lands on `main`. Pages must use **GitHub Actions** as its source in the repository settings.
+The workflow in `.github/workflows/deploy-pages.yml` builds `public/` into `dist/` and publishes it to GitHub Pages on pushes to `main`. Pages must use **GitHub Actions** as its source. The build serves the same game at the original root and the former preview path `/v2/` so existing installs and replay links still work.
 
 ## Privacy
 

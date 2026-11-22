@@ -14,18 +14,19 @@ import {
   resultEmojiRows,
   scoreGuess
 } from "./game.js";
+import { loadSavedState, STORAGE_KEY } from "./state.js";
 
-const STORAGE_KEY = "dailo-state-v1";
 const KEYBOARD_ROWS = ["qwertyuiop", "asdfghjkl", ["z", "x", "c", "v", "b", "n", "m", "backspace"]];
 const validWords = new Set(all);
 const today = localDateKey();
 const dailyAnswers = getDailyAnswers(today, answers);
 const shareIcon = new Image();
-shareIcon.src = new URL("../assets/icon-lighthouse-512.png", import.meta.url).href;
+shareIcon.src = new URL("../assets/icon-home.png", import.meta.url).href;
 
 const els = {
   board: document.querySelector("#board"),
   keyboard: document.querySelector("#keyboard"),
+  keyboardWrap: document.querySelector("#keyboard-wrap"),
   dateLabel: document.querySelector("#date-label"),
   gameKicker: document.querySelector("#game-kicker"),
   gameProgress: document.querySelector("#game-progress"),
@@ -46,11 +47,12 @@ const els = {
   statStreak: document.querySelector("#stat-streak")
 };
 
-let state = loadState();
+const state = loadSavedState(localStorage);
 let activeGame = Number(state.activeGame) || 0;
 let selectedTileIndex = 0;
 let isAnimating = false;
 let viewportSyncFrame = 0;
+let orientationSyncTimers = [];
 
 function syncViewportHeight() {
   cancelAnimationFrame(viewportSyncFrame);
@@ -64,21 +66,17 @@ function syncViewportHeight() {
   });
 }
 
-function syncThemeColor() {
-  const lightColor = document.querySelector('meta[name="theme-color"][media*="light"]');
-  const darkColor = document.querySelector('meta[name="theme-color"][media*="dark"]');
-  if (lightColor) lightColor.content = "#f8faf6";
-  if (darkColor) darkColor.content = "#111827";
+function syncViewportAfterOrientationChange() {
+  orientationSyncTimers.forEach(clearTimeout);
+  syncViewportHeight();
+  orientationSyncTimers = [100, 260, 520].map((delay) => setTimeout(syncViewportHeight, delay));
 }
 
 const stackedSegmentsQuery = window.matchMedia("(vertical-viewport-segments: 2)");
 
 syncViewportHeight();
-const colorScheme = window.matchMedia("(prefers-color-scheme: light)");
-syncThemeColor(colorScheme);
-colorScheme.addEventListener?.("change", syncThemeColor);
 window.addEventListener("resize", syncViewportHeight);
-window.addEventListener("orientationchange", syncViewportHeight);
+window.addEventListener("orientationchange", syncViewportAfterOrientationChange);
 window.visualViewport?.addEventListener("resize", syncViewportHeight);
 window.visualViewport?.addEventListener("scroll", syncViewportHeight);
 
@@ -107,18 +105,6 @@ window.addEventListener("resize", syncFoldLayout);
 window.addEventListener("orientationchange", syncFoldLayout);
 window.visualViewport?.addEventListener("resize", syncFoldLayout);
 stackedSegmentsQuery.addEventListener?.("change", syncFoldLayout);
-
-function loadState() {
-  const fallback = { activeGame: 0, days: {} };
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (!saved || typeof saved !== "object") return fallback;
-    saved.days ||= {};
-    return saved;
-  } catch {
-    return fallback;
-  }
-}
 
 function todayState() {
   state.days[today] ||= { games: Array.from({ length: GAMES_PER_DAY }, emptyGameState) };
@@ -157,6 +143,7 @@ function render() {
   renderStats();
   els.shareButton.hidden = game.status === "playing";
   els.submitButton.hidden = game.status !== "playing";
+  els.keyboardWrap.hidden = game.status !== "playing";
   els.submitButton.disabled = game.status !== "playing" || game.draft.some((letter) => !letter);
 }
 
@@ -230,8 +217,10 @@ function renderSwitcher() {
     button.classList.toggle("is-active", index === activeGame);
     button.toggleAttribute("aria-current", index === activeGame);
     button.dataset.status = game.status !== "playing" ? game.status : game.guesses.length ? "playing" : "not-started";
-    const indicator = button.querySelector("i");
-    indicator.setAttribute("aria-label", game.status === "won" ? "Won" : game.status === "lost" ? "Not solved" : game.guesses.length ? "In progress" : "Not started");
+    const indicator = button.querySelector("img");
+    const complete = game.status !== "playing";
+    indicator.src = `./assets/game-${index + 1}-${complete ? "complete" : "incomplete"}.png`;
+    indicator.alt = `Game ${index + 1}, ${game.status === "won" ? "complete" : game.status === "lost" ? "finished" : game.guesses.length ? "in progress" : "not started"}`;
     button.title = button.disabled ? `Finish game ${index} before starting this game` : `Open game ${index + 1}`;
     button.setAttribute("aria-label", button.disabled ? `Game ${index + 1}, locked until game ${index} is finished` : `Game ${index + 1}`);
   });
@@ -249,7 +238,7 @@ function renderMessage(game, answer) {
   } else if (game.status === "lost") {
     els.gameMessage.innerHTML = `<span>Today's word was <strong>${answer.toUpperCase()}</strong></span>`;
   } else {
-    els.gameMessage.innerHTML = "<span>Tap a tile to place letters in any order</span>";
+    els.gameMessage.replaceChildren();
   }
 }
 
@@ -418,7 +407,7 @@ function hasWin(dateKey) {
 
 function replayUrl() {
   const token = encodeReplayToken(today, activeGame, currentGame().guesses, dailyAnswers[activeGame]);
-  const url = new URL("./replay.html", window.location.href);
+  const url = new URL("./replay.html", document.querySelector('link[rel="canonical"]').href);
   // Keep the payload in the query string: some mobile share previews discard URL fragments.
   url.searchParams.set("r", token);
   return url.href;
@@ -445,27 +434,51 @@ async function drawShareCard() {
   const game = currentGame();
   const answer = dailyAnswers[activeGame];
   const rows = game.guesses.map((guess) => ({ guess, score: scoreGuess(guess, answer) }));
-  ctx.fillStyle = "#111827";
+  const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const palette = dark ? {
+    background: "#081d30",
+    glow: "#3f80a25e",
+    ink: "#f1eedc",
+    muted: "#a8c1ce",
+    accent: "#90d8ad",
+    outline: "#688ea597",
+    correct: "#256546",
+    present: "#f0be4e",
+    absent: "#455767"
+  } : {
+    background: "#e7f4e9",
+    glow: "rgba(153,206,134,.24)",
+    ink: "#174e4a",
+    muted: "#68827b",
+    accent: "#4f9a61",
+    outline: "rgba(255,255,255,.12)",
+    correct: "#6cae70",
+    present: "#d6ae3c",
+    absent: "#77868b"
+  };
+
+  ctx.fillStyle = palette.background;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   const glow = ctx.createRadialGradient(540, 0, 0, 540, 0, 680);
-  glow.addColorStop(0, "rgba(163,230,53,.22)");
-  glow.addColorStop(1, "rgba(17,24,39,0)");
+  glow.addColorStop(0, palette.glow);
+  glow.addColorStop(1, "transparent");
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, canvas.width, 800);
 
   ctx.drawImage(shareIcon, 100, 94, 118, 118);
   ctx.textAlign = "left";
-  ctx.fillStyle = "#fffdf7";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillStyle = palette.ink;
   ctx.font = "800 70px system-ui";
   ctx.fillText("Dailo", 252, 170);
-  ctx.fillStyle = "#8d96a5";
+  ctx.fillStyle = palette.muted;
   ctx.font = "500 29px system-ui";
   ctx.fillText("your daily word trio", 256, 207);
 
-  ctx.fillStyle = "#fffdf7";
+  ctx.fillStyle = palette.ink;
   ctx.font = "800 58px system-ui";
   ctx.fillText(game.status === "won" ? "A lovely little win." : "Tomorrow is a new trio.", 100, 330);
-  ctx.fillStyle = "#a3e635";
+  ctx.fillStyle = palette.accent;
   ctx.font = "700 27px system-ui";
   ctx.fillText(`${today}  ·  GAME ${activeGame + 1} OF 3  ·  ${game.status === "won" ? `${game.guesses.length}/${MAX_GUESSES}` : `X/${MAX_GUESSES}`}`, 100, 385);
 
@@ -478,23 +491,24 @@ async function drawShareCard() {
       const x = startX + column * (size + gap);
       const y = startY + rowIndex * (size + gap);
       if (row) {
-        ctx.fillStyle = row.score[column] === "correct" ? "#5f9513" : row.score[column] === "present" ? "#9a7610" : "#3b4658";
+        const color = row.score[column];
+        ctx.fillStyle = palette[color];
         roundRect(ctx, x, y, size, size, 20);
         ctx.fill();
-        ctx.fillStyle = "#fffdf7";
+        ctx.fillStyle = dark && color === "present" ? "#302309" : "#fffdf4";
         ctx.font = "800 58px system-ui";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(row.guess[column].toUpperCase(), x + size / 2, y + size / 2);
       } else {
         ctx.lineWidth = 3;
-        ctx.strokeStyle = "rgba(255,255,255,.12)";
+        ctx.strokeStyle = palette.outline;
         roundRect(ctx, x, y, size, size, 20);
         ctx.stroke();
       }
     });
   });
-  ctx.fillStyle = "#6f7887";
+  ctx.fillStyle = palette.muted;
   ctx.font = "500 27px system-ui";
   ctx.textAlign = "center";
   ctx.fillText("Three fresh words are waiting tomorrow.", 540, 1265);
@@ -626,7 +640,6 @@ els.gameSwitcher.addEventListener("click", (event) => {
 });
 
 document.querySelector("#help-button").addEventListener("click", () => openModal(els.helpModal));
-document.querySelector("#stats-button").addEventListener("click", () => { renderStats(); openModal(els.statsModal); });
 document.querySelector("#streak-chip").addEventListener("click", () => { renderStats(); openModal(els.statsModal); });
 document.querySelectorAll("[data-close]").forEach((button) => button.addEventListener("click", () => button.closest("dialog").close()));
 document.querySelectorAll("dialog").forEach((dialog) => dialog.addEventListener("click", (event) => {

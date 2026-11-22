@@ -5,7 +5,8 @@
   "type": "module",
   "description": "A beautiful daily trio of five-letter word games.",
   "scripts": {
+    "build": "node scripts/build-site.js",
     "test": "node --test",
-    "serve": "python3 -m http.server 4173 --directory public"
+    "serve": "npm run build && python3 -m http.server 4173 --directory dist"
   }
 }

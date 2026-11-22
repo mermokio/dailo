@@ -14,6 +14,7 @@ import {
   resultEmojiRows,
   scoreGuess
 } from "../public/scripts/game.js";
+import { loadSavedState, STORAGE_KEY } from "../public/scripts/state.js";
 
 test("localDateKey uses local calendar parts", () => {
   assert.equal(localDateKey(new Date(2026, 10, 4, 23, 59)), "2026-11-04");
@@ -76,4 +77,43 @@ test("fold layout activates only for two vertically stacked segments", () => {
   assert.equal(areVerticallyStackedSegments([top, bottom]), true);
   assert.equal(areVerticallyStackedSegments([top, right]), false);
   assert.equal(areVerticallyStackedSegments([top]), false);
+});
+
+test("release merges both local histories and keeps the furthest progress per puzzle", () => {
+  const won = { ...emptyGameState(), status: "won", guesses: ["crane"] };
+  const lost = { ...emptyGameState(), status: "lost", guesses: Array(6).fill("cider") };
+  const draft = { ...emptyGameState(), draft: ["c", "", "i", "", ""] };
+  const previewGame = { ...emptyGameState(), guesses: ["apple"] };
+  const original = {
+    activeGame: 1,
+    days: {
+      "2026-11-15": { games: [won, draft] },
+      "2026-11-16": { games: [won, emptyGameState(), emptyGameState()] }
+    }
+  };
+  const preview = {
+    activeGame: 2,
+    days: {
+      "2026-11-15": { games: [lost, emptyGameState(), previewGame] },
+      "2026-11-17": { games: [previewGame] }
+    }
+  };
+  const data = new Map([
+    ["dailo-state-v1", JSON.stringify(original)],
+    [STORAGE_KEY, JSON.stringify(preview)]
+  ]);
+  const storage = { getItem: (key) => data.get(key) ?? null };
+  const merged = loadSavedState(storage);
+  assert.deepEqual(merged.days["2026-11-15"].games, [won, draft, previewGame]);
+  assert.deepEqual(merged.days["2026-11-16"], original.days["2026-11-16"]);
+  assert.deepEqual(merged.days["2026-11-17"], preview.days["2026-11-17"]);
+  assert.equal(merged.activeGame, 2);
+
+  merged.days["2026-11-15"].games[1] = emptyGameState();
+  data.set(STORAGE_KEY, JSON.stringify(merged));
+  assert.deepEqual(loadSavedState(storage), merged);
+  assert.equal(data.get("dailo-state-v1"), JSON.stringify(original));
+
+  data.set(STORAGE_KEY, "{invalid");
+  assert.deepEqual(loadSavedState(storage).days, original.days);
 });

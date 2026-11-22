@@ -1,6 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { promisify } from "node:util";
 import vm from "node:vm";
 
 test("install promotion is completely removed", async () => {
@@ -28,39 +32,52 @@ test("main and replay pages display the automatically generated deployment versi
   assert.doesNotMatch(html, /No account\. No ads\./);
   assert.match(css, /\.app-version\s*\{[\s\S]*?display:\s*block/);
   assert.match(replayCss, /\.replay-version\s*\{[\s\S]*?text-align:\s*center/);
-  assert.match(workflow, /APP_VERSION:\s*1\.0\.\$\{\{ github\.run_number \}\}/);
-  assert.match(workflow, /sed -i[\s\S]*public\/index\.html public\/replay\.html public\/sw\.js/);
-  assert.match(serviceWorker, /dailo-v__APP_VERSION__/);
+  assert.match(workflow, /APP_VERSION:\s*2\.1\.\$\{\{ github\.run_number \}\}/);
+  assert.match(workflow, /run: npm run build/);
+  assert.match(serviceWorker, /CACHE_NAME = `\$\{CACHE_PREFIX\}__APP_VERSION__`/);
+});
+
+test("the built site uses the same game and replay at the original and preview URLs", async (t) => {
+  const output = await mkdtemp(join(tmpdir(), "dailo-build-test-"));
+  t.after(() => rm(output, { recursive: true, force: true }));
+  await promisify(execFile)(process.execPath, ["scripts/build-site.js", output], {
+    env: { ...process.env, APP_VERSION: "2.1.123" }
+  });
+
+  const home = await readFile(join(output, "index.html"), "utf8");
+  const alias = await readFile(join(output, "v2", "index.html"), "utf8");
+  const replay = await readFile(join(output, "replay.html"), "utf8");
+  assert.match(home, /v2\.1\.123/);
+  assert.doesNotMatch(home, /__APP_VERSION__|· preview/);
+  assert.equal(alias, home.replace('rel="canonical" href="./"', 'rel="canonical" href="../"'));
+  assert.match(replay, /v2\.1\.123/);
+  assert.equal(await readFile(join(output, "v2", "replay.html"), "utf8"), replay);
+  for (const file of ["sw.js", "scripts/app.js", "scripts/state.js", "assets/install-icon-adaptive-180.png"]) {
+    const [original, compatibility] = await Promise.all([
+      readFile(join(output, file)), readFile(join(output, "v2", file))
+    ]);
+    assert.deepEqual(compatibility, original);
+  }
 });
 
 test("game viewport uses height-aware, scroll-free sizing", async () => {
   const css = await readFile(new URL("../public/styles.css", import.meta.url), "utf8");
-  assert.match(css, /height:\s*100dvh/);
+  assert.match(css, /--app-height:\s*100vh/);
   assert.match(css, /overflow:\s*hidden/);
-  assert.match(css, /--app-height:\s*100dvh/);
-  assert.match(css, /--tile-size:[\s\S]*?--app-height/);
+  assert.match(css, /height:\s*var\(--app-height\)/);
+  assert.match(css, /container-type:\s*size/);
   assert.match(css, /safe-area-inset-bottom/);
 });
 
 test("replay layout scales its board and spacing to short viewports", async () => {
   const css = await readFile(new URL("../public/replay.css", import.meta.url), "utf8");
-  assert.match(css, /--replay-tile-size:\s*clamp\([^;]*dvh/);
-  assert.match(css, /--replay-tile-size:\s*clamp\(1\.6rem,\s*min\(17\.5vw,\s*10dvh\),\s*4\.7rem\)/);
-  assert.match(css, /grid-template-columns:\s*repeat\(5, var\(--replay-tile-size\)\)/);
-  assert.match(css, /@media\s*\(max-height:\s*640px\)/);
-  assert.match(css, /--replay-tile-size:\s*clamp\(1\.5rem,\s*min\(15vw,\s*8dvh\),\s*3rem\)/);
-  assert.match(css, /@media\s*\(max-height:\s*430px\)/);
-  assert.match(css, /\.replay-content\s*\{\s*width:\s*min\(100%,\s*30rem\);\s*margin:\s*auto;/);
-  assert.match(css, /\.replay-version\s*\{\s*margin:\s*0;/);
+  assert.match(css, /height:\s*100dvh/);
+  assert.match(css, /--tile-size:\s*min\(16vw,\s*9vh,\s*5rem\)/);
+  assert.match(css, /grid-template-columns:\s*repeat\(5,\s*var\(--tile-size\)\)/);
+  assert.match(css, /@media\s*\(orientation:\s*landscape\)\s*and\s*\(max-height:\s*560px\)/);
+  assert.match(css, /--tile-size:\s*min\(7vh,\s*3\.2rem\)/);
   assert.match(css, /\.replay-meta\s*\{[^}]*white-space:\s*pre-line/);
   assert.match(css, /\.replay-meta\s*\{[^}]*text-align:\s*center/);
-  assert.match(css, /--replay-row-width:\s*calc\(var\(--replay-tile-size\)[^;]+/);
-  assert.match(css, /\.replay-board\s*\{[^}]*width:\s*min\(100%,\s*var\(--replay-row-width\)\)/);
-  assert.match(css, /\.reveal-button\s*\{[^}]*width:\s*min\(100%,\s*var\(--replay-row-width\)\)/);
-  assert.match(css, /\.reveal-button\s*\{[^}]*margin:\s*1rem auto 0/);
-  assert.match(css, /@media\s*\(orientation:\s*landscape\)\s*and\s*\(max-height:\s*760px\)/);
-  assert.match(css, /\.replay-content\s*\{\s*width:\s*min\(100%,\s*22rem\);\s*margin:\s*auto;/);
-  assert.match(css, /\.replay-tile\s*\{[^}]*font-size:\s*clamp\([^;]*dvh/);
   assert.match(css, /\.replay-version\s*\{[\s\S]*?padding-top/);
 });
 
@@ -96,7 +113,7 @@ test("share image sends only a file and emoji share links to a reveal replay", a
   ]);
   assert.match(app, /navigator\.share\(\{ files: \[file\] \}\)/);
   assert.doesNotMatch(app, /navigator\.share\(\{ title: "My Dailo", text: shareText\(\), files:/);
-  assert.match(app, /new URL\("\.\/replay\.html", window\.location\.href\)/);
+  assert.match(app, /new URL\("\.\/replay\.html", document\.querySelector\('link\[rel="canonical"\]'\)\.href\)/);
   assert.match(app, /url\.searchParams\.set\("r", token\)/);
   assert.match(app, /\$\{replayLink\}/);
   assert.match(replayHtml, /id="reveal-button"[^>]*>Reveal guessed letters/);
@@ -189,11 +206,11 @@ test("submit is hidden only when the selected game is finished", async () => {
   assert.match(app, /els\.shareButton\.hidden = game\.status === "playing"/);
 });
 
-test("V2 reserves space between its board and keyboard and hides the keyboard on completion", async () => {
+test("the game reserves space between its board and keyboard and hides the keyboard on completion", async () => {
   const [html, app, css] = await Promise.all([
-    readFile(new URL("../public/v2/index.html", import.meta.url), "utf8"),
-    readFile(new URL("../public/v2/scripts/app.js", import.meta.url), "utf8"),
-    readFile(new URL("../public/v2/styles.css", import.meta.url), "utf8")
+    readFile(new URL("../public/index.html", import.meta.url), "utf8"),
+    readFile(new URL("../public/scripts/app.js", import.meta.url), "utf8"),
+    readFile(new URL("../public/styles.css", import.meta.url), "utf8")
   ]);
   assert.match(html, /id="keyboard-wrap"/);
   assert.match(app, /keyboardWrap\.hidden = game\.status !== "playing"/);
@@ -203,10 +220,10 @@ test("V2 reserves space between its board and keyboard and hides the keyboard on
   assert.match(css, /\.board\s*\{[^}]*width:\s*min\(100%,\s*132cqh\)/);
 });
 
-test("V2 scales game lettering down in landscape and resamples viewport height after rotation", async () => {
+test("the game scales lettering down in landscape and resamples viewport height after rotation", async () => {
   const [app, css] = await Promise.all([
-    readFile(new URL("../public/v2/scripts/app.js", import.meta.url), "utf8"),
-    readFile(new URL("../public/v2/styles.css", import.meta.url), "utf8")
+    readFile(new URL("../public/scripts/app.js", import.meta.url), "utf8"),
+    readFile(new URL("../public/styles.css", import.meta.url), "utf8")
   ]);
   assert.match(css, /@media\s*\(orientation:\s*landscape\)\s*and\s*\(min-width:\s*50rem\)/);
   assert.match(css, /\.tile\s*\{\s*font-size:\s*clamp\(\.9rem,\s*2\.6vh,\s*1\.35rem\)/);
@@ -226,10 +243,10 @@ test("V2 scales game lettering down in landscape and resamples viewport height a
   assert.doesNotMatch(css, /html\s*\{[^}]*overflow:\s*hidden/);
 });
 
-test("V2 replay keeps a softly fading image header without extra labels", async () => {
+test("replay keeps a softly fading image header without extra labels", async () => {
   const [html, css] = await Promise.all([
-    readFile(new URL("../public/v2/replay.html", import.meta.url), "utf8"),
-    readFile(new URL("../public/v2/replay.css", import.meta.url), "utf8")
+    readFile(new URL("../public/replay.html", import.meta.url), "utf8"),
+    readFile(new URL("../public/replay.css", import.meta.url), "utf8")
   ]);
   assert.doesNotMatch(html, /THE COLORS TELL THE STORY|Shared replay/);
   assert.match(css, /body::before\s*\{[^}]*mask-image:\s*linear-gradient\(to bottom/);

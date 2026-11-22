@@ -2,95 +2,68 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#111827" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#f8faf6" media="(prefers-color-scheme: light)" />
-    <meta name="description" content="Dailo is your daily trio of beautifully bite-sized word games." />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#dff3f0" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#061727" media="(prefers-color-scheme: dark)" />
+    <meta name="description" content="A watercolor-inspired daily trio of five-letter word games." />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Dailo" />
+    <link rel="canonical" href="./" />
     <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="icon" href="./assets/icon-lighthouse-192.png" type="image/png" sizes="192x192" />
-    <link rel="apple-touch-icon" href="./assets/icon-lighthouse-180.png" />
-    <link rel="preload" href="./assets/words.js" as="script" crossorigin />
-    <link rel="stylesheet" href="./styles.css" />
-    <title>Dailo — a daily word trio</title>
+    <link rel="icon" href="./assets/icon-lighthouse-192.png" type="image/png" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="./assets/dark/install-icon-192.png" type="image/png" media="(prefers-color-scheme: dark)" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/install-icon-adaptive-180.png" />
+    <script src="./scripts/install-appearance.js?v=__APP_VERSION__"></script>
+    <link rel="preload" href="./assets/board-background-v2.png" as="image" media="(prefers-color-scheme: light)" />
+    <link rel="preload" href="./assets/dark/board.webp" as="image" media="(prefers-color-scheme: dark)" />
+    <link rel="stylesheet" href="./styles.css?v=__APP_VERSION__" />
+    <link rel="stylesheet" href="./night.css?v=__APP_VERSION__" />
+    <title>Dailo — Daily Word Trio</title>
   </head>
   <body>
-    <div class="ambient ambient-one" aria-hidden="true"></div>
-    <div class="ambient ambient-two" aria-hidden="true"></div>
-
     <div class="app-shell">
       <div class="top-screen">
         <header class="topbar">
-        <button class="icon-button" id="help-button" type="button" aria-label="How to play">
-          <span aria-hidden="true">?</span>
-        </button>
-
-        <a class="brand" href="./" aria-label="Dailo home">
-          <span class="brand-mark" aria-hidden="true">
-            <img src="./assets/icon-lighthouse-192.png" alt="" />
-          </span>
-          <span class="brand-copy">
-            <strong>Dailo</strong>
-            <small>your daily word trio</small>
-          </span>
-        </a>
-
-        <button class="icon-button" id="stats-button" type="button" aria-label="Game history and statistics">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20v-7h3v7H5Zm5.5 0V4h3v16h-3ZM16 20v-11h3v11h-3Z"/></svg>
-        </button>
+          <button class="icon-button" id="help-button" type="button" aria-label="How to play"><span aria-hidden="true">?</span></button>
+          <a class="brand" href="./" aria-label="Dailo home">
+            <picture>
+              <source srcset="./assets/dark/header-icon.webp" media="(prefers-color-scheme: dark)" />
+              <img class="brand-icon" src="./assets/icon-home.png" alt="" />
+            </picture>
+            <img class="brand-wordmark" src="./assets/wordmark.png" alt="Dailo" />
+          </a>
         </header>
 
         <main>
-        <section class="day-heading" aria-labelledby="today-label">
-          <div>
-            <p class="eyebrow" id="today-label">Today's trio</p>
-            <h1 id="date-label">Loading today…</h1>
-          </div>
-          <button class="streak-chip" id="streak-chip" type="button" aria-label="View your streak">
-            <span aria-hidden="true">🔥</span>
-            <strong id="streak-count">0</strong>
-          </button>
-        </section>
+          <section class="day-heading" aria-labelledby="today-label">
+            <div><p class="eyebrow" id="today-label">Today's trio</p><h1 id="date-label">Loading today…</h1></div>
+            <button class="streak-chip" id="streak-chip" type="button" aria-label="View your streak and game statistics"><span aria-hidden="true">🔥</span><strong id="streak-count">0</strong></button>
+          </section>
 
-        <nav class="game-switcher" aria-label="Today's games" id="game-switcher">
-          <button class="game-pill is-active" type="button" data-game="0" aria-current="page">
-            <span>01</span><i aria-label="Not started"></i>
-          </button>
-          <div class="game-rail" aria-hidden="true"></div>
-          <button class="game-pill" type="button" data-game="1" disabled>
-            <span>02</span><i aria-label="Not started"></i>
-          </button>
-          <div class="game-rail" aria-hidden="true"></div>
-          <button class="game-pill" type="button" data-game="2" disabled>
-            <span>03</span><i aria-label="Not started"></i>
-          </button>
-        </nav>
+          <nav class="game-switcher" aria-label="Today's games" id="game-switcher">
+            <button class="game-pill is-active" type="button" data-game="0" aria-current="page" aria-label="Game 1"><img src="./assets/game-1-incomplete.png" alt="" /><span class="game-pill-number" aria-hidden="true">1</span></button>
+            <div class="game-rail" aria-hidden="true"></div>
+            <button class="game-pill" type="button" data-game="1" aria-label="Game 2" disabled><img src="./assets/game-2-incomplete.png" alt="" /><span class="game-pill-number" aria-hidden="true">2</span></button>
+            <div class="game-rail" aria-hidden="true"></div>
+            <button class="game-pill" type="button" data-game="2" aria-label="Game 3" disabled><img src="./assets/game-3-incomplete.png" alt="" /><span class="game-pill-number" aria-hidden="true">3</span></button>
+          </nav>
 
-        <section class="game-card" aria-label="Word game">
-          <div class="game-card-topline">
-            <p id="game-kicker">Game 1 of 3</p>
-            <p id="game-progress">0 / 6 guesses</p>
-          </div>
-
-          <div class="board" id="board" aria-label="Six rows of five letter tiles" aria-live="polite"></div>
-
-          <div class="game-message" id="game-message" aria-live="polite">
-            <span>Guess a five-letter word</span>
-          </div>
-
-          <button class="share-result-button" id="share-result-button" type="button" hidden>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.1c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.03-.47-.09-.7l7.05-4.11A2.99 2.99 0 1 0 15 5c0 .24.04.47.09.7L8.04 9.81A3 3 0 1 0 6 15c.79 0 1.5-.31 2.04-.81l7.09 4.14c-.05.21-.08.43-.08.67a2.95 2.95 0 1 0 2.95-2.9Z"/></svg>
-            Share this game
-          </button>
-        </section>
+          <section class="game-card" aria-label="Word game">
+            <div class="game-card-topline" aria-hidden="true"><p id="game-kicker">Game 1 of 3</p><p id="game-progress">0 / 6 guesses</p></div>
+            <div class="board" id="board" aria-label="Six rows of five letter tiles" aria-live="polite"></div>
+            <div class="game-message" id="game-message" aria-live="polite"></div>
+            <button class="share-result-button" id="share-result-button" type="button" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.1c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.03-.47-.09-.7l7.05-4.11A2.99 2.99 0 1 0 15 5c0 .24.04.47.09.7L8.04 9.81A3 3 0 1 0 6 15c.79 0 1.5-.31 2.04-.81l7.09 4.14c-.05.21-.08.43-.08.67a2.95 2.95 0 1 0 2.95-2.9Z"/></svg>Share this game
+            </button>
+          </section>
         </main>
       </div>
 
       <div class="bottom-screen">
-        <section class="keyboard-wrap" aria-label="On-screen keyboard">
-          <button class="submit-guess-button" id="submit-guess-button" type="button" disabled>Submit guess</button>
+        <section class="keyboard-wrap" id="keyboard-wrap" aria-label="On-screen keyboard">
+          <button class="submit-guess-button" id="submit-guess-button" type="button" aria-label="Submit guess" disabled><span>Submit guess</span></button>
           <div class="keyboard" id="keyboard"></div>
         </section>
         <p class="app-version" aria-label="App version">v__APP_VERSION__</p>
@@ -101,56 +74,17 @@
     <div class="confetti" id="confetti" aria-hidden="true"></div>
 
     <dialog class="modal" id="help-modal">
-      <div class="modal-sheet">
-        <button class="modal-close" type="button" data-close aria-label="Close">×</button>
-        <p class="eyebrow">How to play</p>
-        <h2>Three little words.<br />One lovely ritual.</h2>
-        <p>Guess each five-letter word in six tries. Every guess must be in Dailo's word list.</p>
-        <div class="example-row" aria-label="Example: S is correct and in the right place">
-          <span class="example-tile correct">S</span><span class="example-tile">M</span><span class="example-tile">I</span><span class="example-tile">L</span><span class="example-tile">E</span>
-        </div>
-        <p><strong>Green</strong> means the letter is in the word and in the right spot.</p>
-        <div class="example-row" aria-label="Example: A is in the word but in the wrong place">
-          <span class="example-tile">P</span><span class="example-tile present">A</span><span class="example-tile">P</span><span class="example-tile">E</span><span class="example-tile">R</span>
-        </div>
-        <p><strong>Yellow</strong> means the letter is in the word but in another spot.</p>
-        <div class="example-row" aria-label="Example: C is not in the word">
-          <span class="example-tile">B</span><span class="example-tile">R</span><span class="example-tile">I</span><span class="example-tile absent">C</span><span class="example-tile">K</span>
-        </div>
-        <p><strong>Gray</strong> means the letter is not in the word.</p>
-        <button class="primary-button" type="button" data-close>Let's play</button>
-      </div>
+      <div class="modal-sheet"><button class="modal-close" type="button" data-close aria-label="Close">×</button><p class="eyebrow">How to play</p><h2>Three little words.<br />One lovely ritual.</h2><p>Guess each five-letter word in six tries. Every guess must be in Dailo's word list.</p><div class="example-row" aria-label="Example: S is correct and in the right place"><span class="example-tile correct">S</span><span class="example-tile">M</span><span class="example-tile">I</span><span class="example-tile">L</span><span class="example-tile">E</span></div><p><strong>Green</strong> means the letter is in the word and in the right spot.</p><div class="example-row" aria-label="Example: A is in the word but in the wrong place"><span class="example-tile">P</span><span class="example-tile present">A</span><span class="example-tile">P</span><span class="example-tile">E</span><span class="example-tile">R</span></div><p><strong>Yellow</strong> means the letter is in the word but in another spot.</p><div class="example-row" aria-label="Example: C is not in the word"><span class="example-tile">B</span><span class="example-tile">R</span><span class="example-tile">I</span><span class="example-tile absent">C</span><span class="example-tile">K</span></div><p><strong>Gray</strong> means the letter is not in the word.</p><button class="primary-button" type="button" data-close>Let's play</button></div>
     </dialog>
 
     <dialog class="modal" id="stats-modal">
-      <div class="modal-sheet">
-        <button class="modal-close" type="button" data-close aria-label="Close">×</button>
-        <p class="eyebrow">Your Dailo</p>
-        <h2>Small wins,<br />stacked daily.</h2>
-        <div class="stats-grid">
-          <div><strong id="stat-played">0</strong><span>played</span></div>
-          <div><strong id="stat-win-rate">0%</strong><span>win rate</span></div>
-          <div><strong id="stat-streak">0</strong><span>day streak</span></div>
-        </div>
-        <h3>Recent days</h3>
-        <div class="history-list" id="history-list"></div>
-        <button class="primary-button" type="button" data-close>Back to today's trio</button>
-      </div>
+      <div class="modal-sheet"><button class="modal-close" type="button" data-close aria-label="Close">×</button><p class="eyebrow">Your Dailo</p><h2>Small wins,<br />stacked daily.</h2><div class="stats-grid"><div><strong id="stat-played">0</strong><span>played</span></div><div><strong id="stat-win-rate">0%</strong><span>win rate</span></div><div><strong id="stat-streak">0</strong><span>day streak</span></div></div><h3>Recent days</h3><div class="history-list" id="history-list"></div><button class="primary-button" type="button" data-close>Back to today's trio</button></div>
     </dialog>
 
     <dialog class="modal share-modal" id="share-modal">
-      <div class="modal-sheet">
-        <button class="modal-close" type="button" data-close aria-label="Close">×</button>
-        <p class="eyebrow">Made to share</p>
-        <h2>Nice one.</h2>
-        <canvas id="share-canvas" width="1080" height="1350" aria-label="Preview of your share image"></canvas>
-        <div class="share-actions">
-          <button class="primary-button" id="native-share-button" type="button">Share image</button>
-          <button class="secondary-button" id="share-emoji-button" type="button">Share emoji result</button>
-        </div>
-      </div>
+      <div class="modal-sheet"><button class="modal-close" type="button" data-close aria-label="Close">×</button><p class="eyebrow">Made to share</p><h2>Nice one.</h2><canvas id="share-canvas" width="1080" height="1350" aria-label="Preview of your share image"></canvas><div class="share-actions"><button class="primary-button" id="native-share-button" type="button">Share image</button><button class="secondary-button" id="share-emoji-button" type="button">Share emoji result</button></div></div>
     </dialog>
 
-    <script type="module" src="./scripts/app.js"></script>
+    <script type="module" src="./scripts/app.js?v=__APP_VERSION__"></script>
   </body>
 </html>
