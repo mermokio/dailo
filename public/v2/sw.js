@@ -1,15 +1,15 @@
-const CACHE_NAME = "dailo-v2-preview-2.0.26";
+const CACHE_NAME = "dailo-v2-preview-2.0.27";
 const CORE_ASSETS = [
   "./",
   "./index.html",
   "./replay.html",
-  "./styles.css?v=2.0.26",
-  "./replay.css?v=2.0.26",
-  "./night.css?v=2.0.26",
+  "./styles.css?v=2.0.27",
+  "./replay.css?v=2.0.27",
+  "./night.css?v=2.0.27",
   "./manifest.webmanifest",
   "./manifest-dark.webmanifest",
-  "./scripts/app.js?v=2.0.26",
-  "./scripts/install-appearance.js?v=2.0.26",
+  "./scripts/app.js?v=2.0.27",
+  "./scripts/install-appearance.js?v=2.0.27",
   "./scripts/game.js",
   "./scripts/replay.js",
   "./assets/words.js",
