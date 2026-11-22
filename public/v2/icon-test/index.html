@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="robots" content="noindex" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Dailo Icon Test" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+    <title>Dailo Icon Test</title>
+    <style>
+      body {
+        min-height: 100dvh;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 1.5rem;
+        display: grid;
+        place-items: center;
+        font: 1rem/1.5 system-ui, sans-serif;
+        background: Canvas;
+        color: CanvasText;
+      }
+      main { max-width: 29rem; }
+      h1 { margin: 0 0 .5rem; line-height: 1.15; }
+      .previews { display: flex; gap: 1rem; margin: 1.25rem 0; }
+      figure { margin: 0; text-align: center; }
+      img {
+        display: block;
+        border-radius: 22%;
+        background: #f5f2e9;
+        box-shadow: 0 0 0 1px #7776;
+      }
+      .dark img { background: #20252d; }
+      figcaption { margin-top: .4rem; font-size: .875rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Dailo Icon Test</h1>
+      <div class="previews" aria-label="The same artwork on two sample backgrounds">
+        <figure>
+          <img src="./apple-touch-icon.png" alt="Dailo icon on a light background" width="96" height="96" />
+          <figcaption>Light preview</figcaption>
+        </figure>
+        <figure class="dark">
+          <img src="./apple-touch-icon.png" alt="Dailo icon on a dark background" width="96" height="96" />
+          <figcaption>Dark preview</figcaption>
+        </figure>
+      </div>
+      <p>Add this page to your Home Screen from Safari. Keep the default name or call it “Dailo Icon Test.”</p>
+      <p>On the Home Screen, switch between light and dark icon appearances without removing the shortcut. Check whether the sky takes on a different color.</p>
+    </main>
+  </body>
+</html>
