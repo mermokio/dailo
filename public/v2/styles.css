@@ -55,6 +55,7 @@ main { display: flex; height: auto; min-height: 0; flex: 1 1 auto; flex-directio
 .game-rail { height: 3px; background: linear-gradient(90deg, rgba(74,142,127,.25), rgba(47,130,116,.72), rgba(74,142,127,.25)); }
 .game-pill { position: relative; display: block; width: clamp(2rem, 7.5vw, 2.75rem); aspect-ratio: 2.2 / 1; padding: 0; border: 0; border-radius: 999px; background: transparent; cursor: pointer; transition: transform 160ms ease, filter 160ms ease; }
 .game-pill img { display: block; width: 100%; height: 100%; object-fit: fill; filter: drop-shadow(0 3px 3px rgba(44, 83, 74, .2)); }
+.game-pill-number { display: none; }
 .game-pill.is-active { transform: translateY(-2px) scale(1.04); filter: drop-shadow(0 0 5px rgba(68, 144, 92, .5)); }
 .game-pill:disabled { opacity: .9; cursor: not-allowed; }
 

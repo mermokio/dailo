@@ -72,19 +72,9 @@ function syncViewportAfterOrientationChange() {
   orientationSyncTimers = [100, 260, 520].map((delay) => setTimeout(syncViewportHeight, delay));
 }
 
-function syncThemeColor() {
-  const lightColor = document.querySelector('meta[name="theme-color"][media*="light"]');
-  const darkColor = document.querySelector('meta[name="theme-color"][media*="dark"]');
-  if (lightColor) lightColor.content = "#f8faf6";
-  if (darkColor) darkColor.content = "#111827";
-}
-
 const stackedSegmentsQuery = window.matchMedia("(vertical-viewport-segments: 2)");
 
 syncViewportHeight();
-const colorScheme = window.matchMedia("(prefers-color-scheme: light)");
-syncThemeColor(colorScheme);
-colorScheme.addEventListener?.("change", syncThemeColor);
 window.addEventListener("resize", syncViewportHeight);
 window.addEventListener("orientationchange", syncViewportAfterOrientationChange);
 window.visualViewport?.addEventListener("resize", syncViewportHeight);
@@ -456,27 +446,51 @@ async function drawShareCard() {
   const game = currentGame();
   const answer = dailyAnswers[activeGame];
   const rows = game.guesses.map((guess) => ({ guess, score: scoreGuess(guess, answer) }));
-  ctx.fillStyle = "#e7f4e9";
+  const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const palette = dark ? {
+    background: "#081d30",
+    glow: "#3f80a25e",
+    ink: "#f1eedc",
+    muted: "#a8c1ce",
+    accent: "#90d8ad",
+    outline: "#688ea597",
+    correct: "#256546",
+    present: "#f0be4e",
+    absent: "#455767"
+  } : {
+    background: "#e7f4e9",
+    glow: "rgba(153,206,134,.24)",
+    ink: "#174e4a",
+    muted: "#68827b",
+    accent: "#4f9a61",
+    outline: "rgba(255,255,255,.12)",
+    correct: "#6cae70",
+    present: "#d6ae3c",
+    absent: "#77868b"
+  };
+
+  ctx.fillStyle = palette.background;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   const glow = ctx.createRadialGradient(540, 0, 0, 540, 0, 680);
-  glow.addColorStop(0, "rgba(153,206,134,.24)");
-  glow.addColorStop(1, "rgba(231,244,233,0)");
+  glow.addColorStop(0, palette.glow);
+  glow.addColorStop(1, "transparent");
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, canvas.width, 800);
 
   ctx.drawImage(shareIcon, 100, 94, 118, 118);
   ctx.textAlign = "left";
-  ctx.fillStyle = "#174e4a";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillStyle = palette.ink;
   ctx.font = "800 70px system-ui";
   ctx.fillText("Dailo", 252, 170);
-  ctx.fillStyle = "#68827b";
+  ctx.fillStyle = palette.muted;
   ctx.font = "500 29px system-ui";
   ctx.fillText("your daily word trio", 256, 207);
 
-  ctx.fillStyle = "#174e4a";
+  ctx.fillStyle = palette.ink;
   ctx.font = "800 58px system-ui";
   ctx.fillText(game.status === "won" ? "A lovely little win." : "Tomorrow is a new trio.", 100, 330);
-  ctx.fillStyle = "#4f9a61";
+  ctx.fillStyle = palette.accent;
   ctx.font = "700 27px system-ui";
   ctx.fillText(`${today}  ·  GAME ${activeGame + 1} OF 3  ·  ${game.status === "won" ? `${game.guesses.length}/${MAX_GUESSES}` : `X/${MAX_GUESSES}`}`, 100, 385);
 
@@ -489,23 +503,24 @@ async function drawShareCard() {
       const x = startX + column * (size + gap);
       const y = startY + rowIndex * (size + gap);
       if (row) {
-        ctx.fillStyle = row.score[column] === "correct" ? "#6cae70" : row.score[column] === "present" ? "#d6ae3c" : "#77868b";
+        const color = row.score[column];
+        ctx.fillStyle = palette[color];
         roundRect(ctx, x, y, size, size, 20);
         ctx.fill();
-        ctx.fillStyle = "#fffdf4";
+        ctx.fillStyle = dark && color === "present" ? "#302309" : "#fffdf4";
         ctx.font = "800 58px system-ui";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(row.guess[column].toUpperCase(), x + size / 2, y + size / 2);
       } else {
         ctx.lineWidth = 3;
-        ctx.strokeStyle = "rgba(255,255,255,.12)";
+        ctx.strokeStyle = palette.outline;
         roundRect(ctx, x, y, size, size, 20);
         ctx.stroke();
       }
     });
   });
-  ctx.fillStyle = "#68827b";
+  ctx.fillStyle = palette.muted;
   ctx.font = "500 27px system-ui";
   ctx.textAlign = "center";
   ctx.fillText("Three fresh words are waiting tomorrow.", 540, 1265);

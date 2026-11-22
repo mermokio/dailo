@@ -1,16 +1,28 @@
-const CACHE_NAME = "dailo-v2-preview-2.0.23";
+const CACHE_NAME = "dailo-v2-preview-2.0.24";
 const CORE_ASSETS = [
   "./",
   "./index.html",
   "./replay.html",
-  "./styles.css",
-  "./replay.css",
+  "./styles.css?v=2.0.24",
+  "./replay.css?v=2.0.24",
+  "./night.css?v=2.0.24",
   "./manifest.webmanifest",
-  "./scripts/app.js",
+  "./manifest-dark.webmanifest",
+  "./scripts/app.js?v=2.0.24",
+  "./scripts/install-appearance.js?v=2.0.24",
   "./scripts/game.js",
   "./scripts/replay.js",
   "./assets/words.js",
   "./assets/icon-home.png",
+  "../assets/icon-lighthouse-180.png",
+  "../assets/icon-lighthouse-192.png",
+  "../assets/icon-lighthouse-512.png",
+  "./assets/dark/install-icon-180.png",
+  "./assets/dark/install-icon-192.png",
+  "./assets/dark/install-icon-512.png",
+  "./assets/dark/header.webp",
+  "./assets/dark/footer.webp",
+  "./assets/dark/board.webp",
   "./assets/wordmark.png",
   "./assets/header-background.png",
   "./assets/footer-background.png",
@@ -27,14 +39,26 @@ const CORE_ASSETS = [
   "./assets/game-3-complete.png",
   "./assets/game-3-incomplete.png"
 ];
-self.addEventListener("install", (event) => event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS))));
-self.addEventListener("activate", (event) => event.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((key) => key.startsWith("dailo-v2-") && key !== CACHE_NAME).map((key) => caches.delete(key))))));
+self.addEventListener("install", (event) => {
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS)));
+});
+self.addEventListener("activate", (event) => {
+  event.waitUntil(caches.keys().then((keys) => Promise.all(
+    keys.filter((key) => key.startsWith("dailo-v2-") && key !== CACHE_NAME).map((key) => caches.delete(key))
+  )));
+});
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
   if (url.origin !== location.origin) return;
-  event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request).then((response) => {
-    if (response.ok && url.pathname.includes("/v2/")) caches.open(CACHE_NAME).then((cache) => cache.put(event.request, response.clone()));
-    return response;
-  })));
+  event.respondWith(caches.open(CACHE_NAME).then(async (cache) => {
+    if (event.request.mode === "navigate") {
+      try {
+        return await fetch(event.request);
+      } catch {
+        return await cache.match(event.request, { ignoreSearch: true }) || Response.error();
+      }
+    }
+    return await cache.match(event.request) || fetch(event.request);
+  }));
 });
