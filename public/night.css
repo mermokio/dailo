@@ -1,6 +1,8 @@
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
+    /* Safari extends the solid page color behind its controls. */
+    background-color: #061727;
     --ink: #f1eedc;
     --ink-deep: #fcf3d9;
     --muted: #a8c1ce;
@@ -14,10 +16,9 @@
     --night-absent: linear-gradient(150deg, #536675, #313f4e);
   }
 
-  html { background: #061727; }
   body {
     color: var(--ink);
-    background: radial-gradient(ellipse at 50% 28%, #16374e, #0a2237 58%, #071a2e);
+    background: radial-gradient(ellipse at 50% 28%, #16374e, #0a2237 58%, #071a2e) #061727;
   }
 
   .topbar::before {
