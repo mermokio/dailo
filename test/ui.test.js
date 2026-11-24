@@ -75,7 +75,8 @@ test("replay layout scales its board and spacing to short viewports", async () =
   assert.match(css, /--tile-size:\s*min\(16vw,\s*9vh,\s*5rem\)/);
   assert.match(css, /grid-template-columns:\s*repeat\(5,\s*var\(--tile-size\)\)/);
   assert.match(css, /@media\s*\(orientation:\s*landscape\)\s*and\s*\(max-height:\s*560px\)/);
-  assert.match(css, /--tile-size:\s*min\(7vh,\s*3\.2rem\)/);
+  assert.match(css, /--tile-size:\s*min\(7dvh,\s*3\.2rem\)/);
+  assert.match(css, /@media\s*\(max-width:\s*42rem\),\s*\(max-height:\s*650px\)\s*\{\s*#replay-title\s*\{[^}]*clip-path:\s*inset\(50%\)/);
   assert.match(css, /\.replay-meta\s*\{[^}]*white-space:\s*pre-line/);
   assert.match(css, /\.replay-meta\s*\{[^}]*text-align:\s*center/);
   assert.match(css, /\.replay-version\s*\{[\s\S]*?padding-top/);
